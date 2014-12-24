@@ -7,6 +7,7 @@ public class MaterialDesignIconsPluginExtension {
     String cachePath = "${System.getProperty("user.home")}/.material_design_icons"
     String resourceRelativePath = 'src/main/res'
     String pattern
+    boolean clean
 
     public MaterialDesignIconsPluginExtension() {}
 }
