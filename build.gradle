@@ -1,8 +1,10 @@
 apply plugin: 'groovy'
 apply plugin: 'idea'
+apply plugin: 'maven-publish'
 
 sourceCompatibility = 1.5
-version = '1.0'
+version = '0.1.0'
+group='com.tmiyamon'
 
 repositories {
     mavenCentral()
@@ -12,4 +14,18 @@ dependencies {
     compile gradleApi()
     compile localGroovy()
     compile 'com.android.tools.build:gradle:1.0.0'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            group "com.tmiyamon"
+        }
+    }
+    repositories {
+        maven {
+            url "${System.getProperty("user.home")}/.ivy2"
+        }
+    }
 }
