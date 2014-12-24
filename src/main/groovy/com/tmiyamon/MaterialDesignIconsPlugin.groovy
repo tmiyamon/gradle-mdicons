@@ -81,6 +81,18 @@ public class MaterialDesignIconsPlugin implements Plugin<Project> {
         }
     }
 
+    /**
+     * Traverse material design icons repository.
+     * The structure is expected as below
+     *
+     * /iconType/drawable-x/ic_x.png
+     *
+     * @param root
+     * @param iconTypes
+     * @param pattern
+     * @param closure
+     * @return
+     */
     def eachIconFiles(File root, Set iconTypes, String pattern, Closure closure) {
         root.eachDirMatch({ iconTypes.contains(new File(it).getName()) }) {
             it.eachDirMatch({ new File(it).getName().startsWith("drawable")}) {
