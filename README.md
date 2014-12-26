@@ -8,16 +8,16 @@ The plugin copy specified icons from the cloned repository into your application
 ```groovy
 buildscript {
   repositories {
-     mavenCentral()
+    jcenter()
   }
 
   dependencies {
-     classpath 'com.tmiyamon:gradle-mdicons:0.1.0'
+    classpath 'com.tmiyamon:gradle-mdicons:0.1.0'
   }
 }
 
 repositories {
-  mavenCentral()
+  jcenter()
 }
 
 apply plugin: 'com.android.application'
