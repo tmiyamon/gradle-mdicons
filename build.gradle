@@ -1,10 +1,5 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.0'
-    }
+plugins {
+  id 'nu.studer.plugindev' version '1.0.3'
 }
 
 apply plugin: 'groovy'
@@ -25,12 +20,6 @@ dependencies {
     compile 'com.android.tools.build:gradle:1.0.0'
 }
 
-
-task sourcesJar(type: Jar) {
-    from sourceSets.main.allSource
-    classifier = 'sources'
-}
-
 task tag(type: Exec) {
     commandLine 'git', 'tag', "v${version}", '-m', "'bump to ${version}'"
     dependsOn('jar')
@@ -42,41 +31,23 @@ task pushTag(type: Exec) {
 }
 
 if (BINTRAY_API_KEY) {
-    apply plugin: 'com.jfrog.bintray'
+    plugindev {
+        pluginImplementationClass 'com.tmiyamon.MaterialDesignIconsPlugin'
+        pluginDescription 'Gradle plugin for Android to manage official material design icons.'
+        pluginLicenses 'Apache-2.0'
+        pluginTags 'gradle', 'plugin', 'android'
+        authorId 'tmiyamon'
+        authorName 'Takuya Miyamoto'
+        authorEmail 'miyamototakuya@gmail.com'
+        projectUrl 'https://github.com/tmiyamon/gradle-mdicons'
+        projectInceptionYear '2014'
+        done()
+    }
 
     bintray {
-        user = 'tmiyamon'
-        key = BINTRAY_API_KEY
-
-        //publications = ['mavenStuff']
-        dryRun = DRY_RUN //Whether to run this as dry-run, without deploying
-        publish = false //If version should be auto published after an upload
-        pkg {
-            repo = 'gradle-mdicons'
-            name = 'gralde-mdicons'
-            websiteUrl = 'https://github.com/tmiyamon/gradle-mdicons'
-            issueTrackerUrl = 'https://github.com/tmiyamon/gradle-mdicons/issues'
-            vcsUrl = 'https://github.com/tmiyamon/gradle-mdicons'
-            licenses = ['Apache-2.0']
-            publicDownloadNumbers = true
-
-            version {
-                name = '0.1.0'
-                vcsTag = '0.1.0'
-                attributes = ['gradle-plugin': 'com.tmiyamon:com.use.less.gradle:gradle-useless-plugin'] //Optional version-level attributes
-                gpg {
-                    sign = true //Determines whether to GPG sign the files. The default is false
-                }
-            }
-        }
-    }
-
-    def bintrayUploadDepend = ['jar', 'sourcesJar']
-    if (!DRY_RUN) {
-        bintrayUploadDepend.add 'pushTag'
-    }
-
-    bintrayUpload {
-        dependsOn(bintrayUploadDepend)
+        user = "tmiyamon"
+        key = "$BINTRAY_API_KEY"
+        pkg.repo = 'gradle-plugins'
     }
 }
+
