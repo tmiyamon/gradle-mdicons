@@ -21,7 +21,7 @@ public class MaterialDesignIconsPlugin implements Plugin<Project> {
             def repoUrl = 'git@github.com:google/material-design-icons.git'
             def cacheDir = new File(project.mdicons.cachePath);
             def pattern = project.mdicons.pattern
-            def projectResourceDir = new File(project.getProjectDir(), project.mdicons.resourceRelativePath)
+            def resourceDir = project.file(project.mdicons.resourcePath)
 
             def iconTypes = [
                 'action','alert','av','communication','content','device',
@@ -39,7 +39,7 @@ public class MaterialDesignIconsPlugin implements Plugin<Project> {
             def cleanIcons = project.task('cleanIcons', dependsOn: 'cloneRepository') {
                 if (cacheDir.isDirectory()) {
                     eachIconFiles(cacheDir, iconTypes, null) { cachedIconFile ->
-                        def projectTypedDrawableDir = new File(projectResourceDir, cachedIconFile.getParentFile().getName())
+                        def projectTypedDrawableDir = new File(resourceDir, cachedIconFile.getParentFile().getName())
 
                         def projectResourceFile = new File(projectTypedDrawableDir, cachedIconFile.getName())
                         if (projectResourceFile.exists()) {
@@ -49,35 +49,31 @@ public class MaterialDesignIconsPlugin implements Plugin<Project> {
                 }
             }
 
-            def copyIconsDependencies = [cloneRepository]
-            if (project.mdicons.clean) {
-                copyIconsDependencies.add(cleanIcons)
-            }
-
-            project.task('copyIcons', dependsOn: copyIconsDependencies) {
-                if (cacheDir.isDirectory() && pattern != null) {
-                    if (!projectResourceDir.isDirectory()) {
-                        projectResourceDir.mkdir();
-                    }
-
-                    eachIconFiles(cacheDir, iconTypes, pattern) { cachedIconFile ->
-                        def projectTypedDrawableDir = new File(projectResourceDir, cachedIconFile.getParentFile().getName())
-                        if (!projectTypedDrawableDir.isDirectory()) {
-                            projectTypedDrawableDir.mkdir()
+            if (!project.mdicons.isConfigChanged(project)) {
+                project.task('copyIcons', dependsOn: [cloneRepository, cleanIcons]) {
+                    if (cacheDir.isDirectory() && pattern != null) {
+                        if (!resourceDir.isDirectory()) {
+                            resourceDir.mkdir();
                         }
 
-                        if (!new File(projectTypedDrawableDir, cachedIconFile.getName()).exists()) {
-                            project.logger.debug("copy from ${cachedIconFile} to ${projectTypedDrawableDir}")
+                        eachIconFiles(cacheDir, iconTypes, pattern) { cachedIconFile ->
+                            def projectTypedDrawableDir = new File(resourceDir, cachedIconFile.getParentFile().getName())
+                            if (!projectTypedDrawableDir.isDirectory()) {
+                                projectTypedDrawableDir.mkdir()
+                            }
 
-                            project.copy {
-                                from cachedIconFile
-                                into projectTypedDrawableDir
+                            if (!new File(projectTypedDrawableDir, cachedIconFile.getName()).exists()) {
+                                project.copy {
+                                    from cachedIconFile
+                                    into projectTypedDrawableDir
+                                }
                             }
                         }
                     }
+
+                    project.mdicons.save(project)
                 }
             }
-
         }
     }
 
@@ -104,5 +100,6 @@ public class MaterialDesignIconsPlugin implements Plugin<Project> {
             }
         }
     }
+
 }
 
