@@ -4,7 +4,7 @@ apply plugin: 'maven-publish'
 
 sourceCompatibility = 1.5
 version = '0.1.0'
-group='com.tmiyamon'
+group ='com.tmiyamon'
 
 repositories {
     mavenCentral()
@@ -20,7 +20,8 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             from components.java
-            group "com.tmiyamon"
+            groupId "com.tmiyamon"
+            artifactId 'gradle-mdicons'
         }
     }
     repositories {

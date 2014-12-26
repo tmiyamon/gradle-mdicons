@@ -12,7 +12,7 @@ buildscript {
   }
 
   dependencies {
-     classpath 'com.tmiyamon:gradle-material-design-icons-plugin:0.1.0'
+     classpath 'com.tmiyamon:gradle-mdicons-plugin:0.1.0'
   }
 }
 
@@ -35,10 +35,8 @@ You should specify icon name you want to use in your application with regex patt
 ```groovy
 mdicons {
     pattern '(refresh|search)_white'
-    clean true
 }
 ```
 
 - The regex `pattern` matches the name of icons, and does not match the icon type such as 'navigation', 'action' etc. Default is `null` and then do nothing.
-- If `clean` is true, the plugin remove just icons material design icons repository has from your application in each builds. Default is `false`
 

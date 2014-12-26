@@ -1,7 +1,10 @@
 package com.tmiyamon
 
+import com.android.build.gradle.AppPlugin
+import com.android.build.gradle.LibraryPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.plugins.ApplicationPlugin
 
 /**
@@ -13,12 +16,20 @@ public class MaterialDesignIconsPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.extensions.create("mdicons", MaterialDesignIconsPluginExtension)
 
-        project.plugins.withType(ApplicationPlugin) {
-            project.tasks.findByName('run').dependsOn('copyIcons')
+        def cloneRepositoryTask = project.task('mdiconsCloneRepository')
+        def cleanIconsTask = project.task('mdiconsCleanIcons', dependsOn: cloneRepositoryTask)
+        def copyIconsTask = project.task('mdiconsCopyIcons', dependsOn: [cloneRepositoryTask, cleanIconsTask])
+        def mainTask = project.task('mdicons', dependsOn: [copyIconsTask, cleanIconsTask, cloneRepositoryTask])
+
+        project.plugins.withType(AppPlugin) {
+            project.tasks.findByName("preBuild").dependsOn(mainTask)
+        }
+        project.plugins.withType(LibraryPlugin) {
+            project.tasks.findByName("preBuild").dependsOn(mainTask)
         }
 
         project.afterEvaluate {
-            def repoUrl = 'git@github.com:google/material-design-icons.git'
+            def configChanged = project.mdicons.isChanged(project)
             def cacheDir = new File(project.mdicons.cachePath);
             def pattern = project.mdicons.pattern
             def resourceDir = project.file(project.mdicons.resourcePath)
@@ -29,50 +40,52 @@ public class MaterialDesignIconsPlugin implements Plugin<Project> {
                 'notification','social','toggle'
             ] as Set
 
-            def cloneRepository = project.task('cloneRepository') {
-                if (!cacheDir.isDirectory()) {
+            if (!cacheDir.isDirectory()) {
+                def repoUrl = 'git@github.com:google/material-design-icons.git'
+
+                cloneRepositoryTask.doLast {
                     def command = "git clone ${repoUrl} ${cacheDir.getAbsolutePath()}"
                     command.execute().waitFor()
                 }
             }
 
-            def cleanIcons = project.task('cleanIcons', dependsOn: 'cloneRepository') {
-                if (cacheDir.isDirectory()) {
+            if (configChanged && cacheDir.isDirectory()) {
+                cleanIconsTask.doLast {
                     eachIconFiles(cacheDir, iconTypes, null) { cachedIconFile ->
                         def projectTypedDrawableDir = new File(resourceDir, cachedIconFile.getParentFile().getName())
 
                         def projectResourceFile = new File(projectTypedDrawableDir, cachedIconFile.getName())
                         if (projectResourceFile.exists()) {
-                           projectResourceFile.delete()
+                            projectResourceFile.delete()
                         }
                     }
                 }
             }
 
-            if (!project.mdicons.isConfigChanged(project)) {
-                project.task('copyIcons', dependsOn: [cloneRepository, cleanIcons]) {
-                    if (cacheDir.isDirectory() && pattern != null) {
-                        if (!resourceDir.isDirectory()) {
-                            resourceDir.mkdir();
+            if (configChanged && cacheDir.isDirectory() && pattern != null) {
+                copyIconsTask.doLast {
+                    if (!resourceDir.isDirectory()) {
+                        resourceDir.mkdir();
+                    }
+
+                    eachIconFiles(cacheDir, iconTypes, pattern) { cachedIconFile ->
+                        def projectTypedDrawableDir = new File(resourceDir, cachedIconFile.getParentFile().getName())
+                        if (!projectTypedDrawableDir.isDirectory()) {
+                            projectTypedDrawableDir.mkdir()
                         }
 
-                        eachIconFiles(cacheDir, iconTypes, pattern) { cachedIconFile ->
-                            def projectTypedDrawableDir = new File(resourceDir, cachedIconFile.getParentFile().getName())
-                            if (!projectTypedDrawableDir.isDirectory()) {
-                                projectTypedDrawableDir.mkdir()
-                            }
-
-                            if (!new File(projectTypedDrawableDir, cachedIconFile.getName()).exists()) {
-                                project.copy {
-                                    from cachedIconFile
-                                    into projectTypedDrawableDir
-                                }
+                        if (!new File(projectTypedDrawableDir, cachedIconFile.getName()).exists()) {
+                            project.copy {
+                                from cachedIconFile
+                                into projectTypedDrawableDir
                             }
                         }
                     }
-
-                    project.mdicons.save(project)
                 }
+            }
+
+            mainTask.doLast {
+                project.mdicons.save(project)
             }
         }
     }
