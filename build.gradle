@@ -32,6 +32,7 @@ task pushTag(type: Exec) {
 
 if (BINTRAY_API_KEY) {
     plugindev {
+        pluginId 'com.tmiyamon.mdicons'
         pluginImplementationClass 'com.tmiyamon.MaterialDesignIconsPlugin'
         pluginDescription 'Gradle plugin for Android to manage official material design icons.'
         pluginLicenses 'Apache-2.0'
