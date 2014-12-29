@@ -35,11 +35,11 @@ You should specify icon name you want to use in your application with regex patt
 
 ```groovy
 mdicons {
-    pattern '(refresh|search)_white'
+    pattern '(refresh|search)_white_24dp'
 }
 ```
 
-get result below
+gets result
 
 ![result](/gradle-mdicons-result.png)
 
