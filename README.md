@@ -1,7 +1,8 @@
 # Gradle Material Design Icons Plugin
 
-This plugin will manage [google's official material design icons](https://github.com/google/material-design-icons) in your build.gradle.
-The plugin copy specified icons from the cloned repository into your application.
+This plugin will manage [google's official material design icons](https://github.com/google/material-design-icons) in your build.gradle.<br/>
+The plugin copy specified icons from the cloned repository into your application.<br/>
+Now focus on the png icons only.
 
 ## Usage
 
@@ -38,5 +39,15 @@ mdicons {
 }
 ```
 
-- The regex `pattern` matches the name of icons, and does not match the icon type such as 'navigation', 'action' etc. Default is `null` and then do nothing.
+get result below
 
+![result](/gradle-mdicons-result.png)
+
+### pattern
+The regex `pattern` matches the file name of icons, and does not match the icon type such as 'navigation', 'action' etc. Default is `null` and then do nothing.
+
+The google's material design icons repository has the naming rule of the icons like `${iconname}_${color}_${size}`.<br/>
+The `color` is `black`, `white` or `grey600`.<br/>
+The `size` is `18dp`, `24dp`, `36dp` or `48dp`.<br/>
+
+The matched icon with the regex pattern will be copied for the all screen sizes material design icons has (hdpi, mdpi, xhdpi, xxhdpi and xxxhdpi).
