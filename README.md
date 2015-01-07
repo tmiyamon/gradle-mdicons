@@ -7,6 +7,8 @@ Now focus on the png icons only.
 This plugin makes meta file `.mdicons` to save current settings to avoid evaluate in every build.<br/>
 Referring to this file this plugin detect changing settings and update icon set.
 
+Making regex is painful? Now creating support tool so please be patient.
+
 ## Usage
 
 ```groovy
