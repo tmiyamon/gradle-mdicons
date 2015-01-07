@@ -4,6 +4,9 @@ This plugin will manage [google's official material design icons](https://github
 The plugin copy specified icons from the cloned repository into your application.<br/>
 Now focus on the png icons only.
 
+This plugin makes meta file `.mdicons` to save current settings to avoid evaluate in every build.<br/>
+Referring to this file this plugin detect changing settings and update icon set.
+
 ## Usage
 
 ```groovy
