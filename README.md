@@ -1,5 +1,7 @@
 # Gradle Material Design Icons Plugin
 
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-gradle--mdicons-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/1334)
+
 This plugin will manage [google's official material design icons](https://github.com/google/material-design-icons) in your build.gradle.<br/>
 The plugin copy specified icons from the cloned repository into your application.<br/>
 Now focus on the png icons only.
