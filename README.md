@@ -2,14 +2,11 @@
 
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-gradle--mdicons-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/1334)
 
-This plugin will manage [google's official material design icons](https://github.com/google/material-design-icons) in your build.gradle.<br/>
-The plugin copy specified icons from the cloned repository into your application.<br/>
-Now focus on the png icons only.
+This plugin will manage Google's official [material design icons](https://github.com/google/material-design-icons) in your build.gradle. The plugin copies specified icons from the material design icon repository into your application allowing you to focus on the png icons only.
 
-This plugin makes meta file `.mdicons` to save current settings to avoid evaluate in every build.<br/>
-Referring to this file this plugin detect changing settings and update icon set.
+This plugin creates a meta file, `.mdicons`, to save settings and avoid evaluation during every build. Changes are automatically detected and icons are updated based on the changes.
 
-Making regex is painful? Now creating support tool so please be patient.
+Is writing regex painful? A support tool is being written, please be patient.
 
 ## Usage
 
@@ -30,15 +27,15 @@ repositories {
 
 apply plugin: 'com.android.application'
 apply plugin: 'com.tmiyamon.mdicons'
-
 ```
 
-The plugin will clone the material design icons repository in your local environment first, and then refer to it for later build cycle.
-So, the first build will take a while for cloning.
+The plugin will clone the material design icons repository to your local environment first, and then refer to it for later builds. The first build will take a while as a result of the clone.
 
 ## Configuration
 
-You should specify icon name you want to use in your application with regex pattern. If you don't do it, the plugin do nothing.
+Specify the icon(s) name you want to use in your application with a regex pattern. Failure to specify a pattern will result in no icons being added.
+
+The following pattern
 
 ```groovy
 mdicons {
@@ -46,15 +43,14 @@ mdicons {
 }
 ```
 
-gets result
+results in
 
 ![result](/gradle-mdicons-result.png)
 
-### pattern
-The regex `pattern` matches the file name of icons, and does not match the icon type such as 'navigation', 'action' etc. Default is `null` and then do nothing.
+### Pattern
 
-The google's material design icons repository has the naming rule of the icons like `${iconname}_${color}_${size}`.<br/>
-The `color` is `black`, `white` or `grey600`.<br/>
-The `size` is `18dp`, `24dp`, `36dp` or `48dp`.<br/>
+The regex `pattern` matches the file name of icons, but does not match the icon type such as 'navigation', 'action' etc. The Default is pattern is `null` and will do nothing.
 
-The matched icon with the regex pattern will be copied for the all screen sizes material design icons has (hdpi, mdpi, xhdpi, xxhdpi and xxxhdpi).
+Google's [material design icons repository](https://github.com/google/material-design-icons) follows a naming convention of `${iconname}_${color}_${size}`. Where the `color` is `black`, `white` or `grey600` and the `size` is `18dp`, `24dp`, `36dp` or `48dp`.
+
+The icon(s) matching the regex pattern will be copied for all screen densities present in the [material design icons repository](https://github.com/google/material-design-icons) (hdpi, mdpi, xhdpi, xxhdpi and xxxhdpi).
