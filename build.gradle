@@ -20,16 +20,6 @@ dependencies {
     compile 'com.android.tools.build:gradle:1.0.0'
 }
 
-task tag(type: Exec) {
-    commandLine 'git', 'tag', "v${version}", '-m', "'bump to ${version}'"
-    dependsOn('jar')
-}
-
-task pushTag(type: Exec) {
-    commandLine 'git', 'push', '--tags', '-q', 'origin'
-    dependsOn('tag')
-}
-
 if (BINTRAY_API_KEY) {
     plugindev {
         pluginId 'com.tmiyamon.mdicons'
