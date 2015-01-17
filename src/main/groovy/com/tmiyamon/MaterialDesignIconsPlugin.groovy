@@ -1,5 +1,6 @@
 package com.tmiyamon
 
+import bsh.StringUtil
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
 import org.gradle.api.Plugin
@@ -31,7 +32,7 @@ public class MaterialDesignIconsPlugin implements Plugin<Project> {
         project.afterEvaluate {
             def configChanged = project.mdicons.isChanged(project)
             def cacheDir = new File(project.mdicons.cachePath);
-            def pattern = project.mdicons.pattern
+            def pattern = project.mdicons.buildPattern()
             def resourceDir = project.file(project.mdicons.resourcePath)
 
             def iconTypes = [
@@ -62,7 +63,7 @@ public class MaterialDesignIconsPlugin implements Plugin<Project> {
                 }
             }
 
-            if (configChanged && cacheDir.isDirectory() && pattern != null) {
+            if (configChanged && cacheDir.isDirectory() && Utils.isNotEmpty(pattern)) {
                 copyIconsTask.doLast {
                     if (!resourceDir.isDirectory()) {
                         resourceDir.mkdir();
@@ -105,7 +106,7 @@ public class MaterialDesignIconsPlugin implements Plugin<Project> {
     def eachIconFiles(File root, Set iconTypes, String pattern, Closure closure) {
         root.eachDirMatch({ iconTypes.contains(new File(it).getName()) }) {
             it.eachDirMatch({ new File(it).getName().startsWith("drawable")}) {
-                if (pattern != null) {
+                if (Utils.isNotEmpty(pattern)) {
                     it.eachFileMatch({ new File(it).getName() =~ pattern }, closure)
                 } else {
                     it.eachFile(closure)

@@ -7,45 +7,100 @@ import org.gradle.api.Project
  */
 public class MaterialDesignIconsPluginExtension {
     static final String FILENAME = '.mdicons'
-    static final def SAVE_FIELD_NAMES = ['cachePath', 'resourcePath', 'pattern']
 
     String cachePath = "${System.getProperty("user.home")}/.material_design_icons"
     String resourcePath = 'src/main/res'
-    String pattern
+    def patterns = [];
 
     public MaterialDesignIconsPluginExtension() {}
 
-    public void save(Project project) {
+    public Map<String, String> toMap() {
         def that = this
+        return new LinkedHashMap<String, String>(){{
+            put('cachePath', that.cachePath)
+            put('resourcePath', that.resourcePath)
+            if (that.patterns != null) {
+                put('patterns', that.patterns.join(','))
+            }
+        }}
+    }
+
+    public static MaterialDesignIconsPluginExtension fromMap(Map<String, String> map) {
+        def ext = new MaterialDesignIconsPluginExtension()
+        ext.cachePath = map['cachePath']
+        ext.resourcePath = map['resourcePath']
+
+        def patterns = map['patterns']
+        if (Utils.isNotEmpty(patterns)) {
+            patterns.split(',').each { pattern ->
+                ext.pattern pattern
+            }
+        }
+        return ext
+    }
+
+    public void save(Project project) {
         project.file(FILENAME).withWriter { out ->
-            SAVE_FIELD_NAMES.each { field ->
-                out.writeLine("${field}=${Utils.getValue(that, field)}")
+            toMap().each { key, value ->
+                out.writeLine("${key}=${value}")
             }
         }
     }
 
     public boolean isChanged(Project project) {
         def prevConfig = project.file(FILENAME)
-
-        def fields = SAVE_FIELD_NAMES as Set
         def that = this
 
         if (prevConfig.exists()) {
-            boolean result = true
-            prevConfig.splitEachLine("=") { String field, def value ->
-                if (fields.contains(field)) {
-                    result = result && (value == Utils.getValue(that, field))
-                }
+            def map = new HashMap<String, String>()
+            prevConfig.splitEachLine("=") {
+                map.put(it[0], it[1])
             }
-            return !result
-        } else {
-            return true
+            return !that.toMap().equals(map)
         }
 
+        return true
     }
+
+    public void pattern(String str) {
+        patterns.add(str)
+    }
+
+    public String buildPattern() {
+        if (Utils.isNotEmpty(patterns)) {
+            return "(${patterns.join("|")})"
+        }
+        return null
+    }
+
 
     @Override
     public String toString() {
-        return "MaterialDesignIconsPluginExtension: pattern=${pattern}, cachePath=${cachePath}, resourcePath=${resourcePath}"
+        return "MaterialDesignIconsPluginExtension{" +
+                "cachePath='" + cachePath + '\'' +
+                ", resourcePath='" + resourcePath + '\'' +
+                ", patterns=" + patterns +
+                '}';
+    }
+
+    boolean equals(o) {
+        if (this.is(o)) return true
+        if (getClass() != o.class) return false
+
+        MaterialDesignIconsPluginExtension that = (MaterialDesignIconsPluginExtension) o
+
+        if (cachePath != that.cachePath) return false
+        if (patterns.size() != that.patterns.size() || (patterns - that.patterns).size() != 0)  return false
+        if (resourcePath != that.resourcePath) return false
+
+        return true
+    }
+
+    int hashCode() {
+        int result
+        result = (cachePath != null ? cachePath.hashCode() : 0)
+        result = 31 * result + (resourcePath != null ? resourcePath.hashCode() : 0)
+        result = 31 * result + (patterns != null ? patterns.hashCode() : 0)
+        return result
     }
 }

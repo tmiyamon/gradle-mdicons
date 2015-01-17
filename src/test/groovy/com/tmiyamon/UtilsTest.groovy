@@ -37,5 +37,13 @@ class UtilsTest {
         assert "value", dummy.test
     }
 
+    @Test
+    public void flatList_returnListHavingParam() {
+        assert ["test"] == Utils.flatList("test")
+    }
 
+    @Test
+    public void flatList_returnFlatListIfParamsIsList() {
+        assert ["test"] == Utils.flatList(["test"])
+    }
 }
