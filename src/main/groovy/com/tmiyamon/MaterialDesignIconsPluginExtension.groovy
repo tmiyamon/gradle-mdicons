@@ -63,7 +63,9 @@ public class MaterialDesignIconsPluginExtension {
     }
 
     public void pattern(String str) {
-        patterns.add(str)
+        if (Utils.isNotEmpty(str)) {
+            patterns.add(str)
+        }
     }
 
     public String buildPattern() {

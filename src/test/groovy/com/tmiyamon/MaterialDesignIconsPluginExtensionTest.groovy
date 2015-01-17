@@ -1,11 +1,19 @@
 package com.tmiyamon
 
+import org.junit.Before
 import org.junit.Test
 
 /**
  * Created by tmiyamon on 1/17/15.
  */
 class MaterialDesignIconsPluginExtensionTest {
+    def ext
+
+    @Before
+    public void before() {
+        ext = new MaterialDesignIconsPluginExtension()
+    }
+
 
     @Test
     public void equals_worksWell() {
@@ -76,7 +84,6 @@ class MaterialDesignIconsPluginExtensionTest {
 
     @Test
     public void toMap_returnsFieldsMap() {
-        def ext = new MaterialDesignIconsPluginExtension()
         ext.cachePath = 'a'
         ext.resourcePath = 'b'
         ext.pattern 'c'
@@ -90,7 +97,6 @@ class MaterialDesignIconsPluginExtensionTest {
 
     @Test
     public void fromMap_returnCorrectObject() {
-        def ext = new MaterialDesignIconsPluginExtension()
         ext.cachePath = 'a'
         ext.resourcePath = 'b'
         ext.pattern 'c'
@@ -111,14 +117,30 @@ class MaterialDesignIconsPluginExtensionTest {
 
     @Test
     public void buildPattern_returnsNullIfPatternIsEmptryArray() {
-        def ext = new MaterialDesignIconsPluginExtension()
         assert null == ext.buildPattern()
     }
 
     @Test
     public void buildPattern_returnsNullIfPatternIsNull() {
-        def ext = new MaterialDesignIconsPluginExtension()
         ext.patterns = null
         assert null == ext.buildPattern()
+    }
+
+    @Test
+    public void pattern_addsToPatternIfPatternIsNotEmpty() {
+        ext.pattern 'a'
+        assert ext.patterns == ['a']
+    }
+
+    @Test
+    public void pattern_doesNotAddToPatternIfPatternIsEmpty() {
+        ext.pattern ''
+        assert ext.patterns == []
+    }
+
+    @Test
+    public void pattern_doesNotAddToPatternIfPatternIsNull() {
+        ext.pattern null
+        assert ext.patterns == []
     }
 }
