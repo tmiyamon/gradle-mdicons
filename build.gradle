@@ -1,9 +1,8 @@
 plugins {
+  id 'groovy'
+  id 'idea'
   id 'nu.studer.plugindev' version '1.0.3'
 }
-
-apply plugin: 'groovy'
-apply plugin: 'idea'
 
 sourceCompatibility = 1.5
 version = '0.2.1'
@@ -20,21 +19,21 @@ dependencies {
     compile 'com.android.tools.build:gradle:1.0.0'
 }
 
-if (BINTRAY_API_KEY) {
-    plugindev {
-        pluginId 'com.tmiyamon.mdicons'
-        pluginImplementationClass 'com.tmiyamon.MaterialDesignIconsPlugin'
-        pluginDescription 'Gradle plugin for Android to manage official material design icons.'
-        pluginLicenses 'Apache-2.0'
-        pluginTags 'gradle', 'plugin', 'android'
-        authorId 'tmiyamon'
-        authorName 'Takuya Miyamoto'
-        authorEmail 'miyamototakuya@gmail.com'
-        projectUrl 'https://github.com/tmiyamon/gradle-mdicons'
-        projectInceptionYear '2014'
-        done()
-    }
+plugindev {
+    pluginId 'com.tmiyamon.mdicons'
+    pluginImplementationClass 'com.tmiyamon.MaterialDesignIconsPlugin'
+    pluginDescription 'Gradle plugin for Android to manage official material design icons.'
+    pluginLicenses 'Apache-2.0'
+    pluginTags 'gradle', 'plugin', 'android'
+    authorId 'tmiyamon'
+    authorName 'Takuya Miyamoto'
+    authorEmail 'miyamototakuya@gmail.com'
+    projectUrl 'https://github.com/tmiyamon/gradle-mdicons'
+    projectInceptionYear '2014'
+    done()
+}
 
+if (hasProperty('BINTRAY_API_KEY')) {
     bintray {
         user = "tmiyamon"
         key = "$BINTRAY_API_KEY"
