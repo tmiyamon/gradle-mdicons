@@ -15,14 +15,14 @@ public class MaterialDesignIconsPluginExtension {
     public MaterialDesignIconsPluginExtension() {}
 
     public Map<String, String> toMap() {
-        def that = this
-        return new LinkedHashMap<String, String>(){{
-            put('cachePath', that.cachePath)
-            put('resourcePath', that.resourcePath)
-            if (that.patterns != null) {
-                put('patterns', that.patterns.join(','))
-            }
-        }}
+        def map = new LinkedHashMap<String, String>()
+        map.put('cachePath', cachePath)
+        map.put('resourcePath', resourcePath)
+        if (patterns != null) {
+            map.put('patterns', patterns.join(','))
+        }
+
+        return map
     }
 
     public static MaterialDesignIconsPluginExtension fromMap(Map<String, String> map) {
