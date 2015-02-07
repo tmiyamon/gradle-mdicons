@@ -1,5 +1,7 @@
 package com.tmiyamon
 
+import groovy.json.JsonBuilder
+import groovy.json.JsonSlurper
 import org.gradle.api.Project
 
 /**
@@ -10,55 +12,32 @@ public class MaterialDesignIconsPluginExtension {
 
     String cachePath = "${System.getProperty("user.home")}/.material_design_icons"
     String resourcePath = 'src/main/res'
-    def patterns = [];
+    private def patterns = [];
 
     public MaterialDesignIconsPluginExtension() {}
 
-    public Map<String, String> toMap() {
-        def map = new LinkedHashMap<String, String>()
-        map.put('cachePath', cachePath)
-        map.put('resourcePath', resourcePath)
-        if (patterns != null) {
-            map.put('patterns', patterns.join(','))
-        }
-
-        return map
+    public Map<String, Serializable> toMap() {
+        return [
+            cachePath: cachePath,
+            resourcePath: resourcePath,
+            patterns: patterns
+        ]
     }
 
-    public static MaterialDesignIconsPluginExtension fromMap(Map<String, String> map) {
-        def ext = new MaterialDesignIconsPluginExtension()
-        ext.cachePath = map['cachePath']
-        ext.resourcePath = map['resourcePath']
-
-        def patterns = map['patterns']
-        if (Utils.isNotEmpty(patterns)) {
-            patterns.split(',').each { pattern ->
-                ext.pattern pattern
-            }
-        }
-        return ext
+    public String toJson() {
+        return new JsonBuilder(toMap()).toString()
     }
 
     public void save(Project project) {
-        project.file(FILENAME).withWriter { out ->
-            toMap().each { key, value ->
-                out.writeLine("${key}=${value}")
-            }
-        }
+        project.file(FILENAME).withWriter { it.writeLine(toJson()) }
     }
 
     public boolean isChanged(Project project) {
-        def prevConfig = project.file(FILENAME)
-        def that = this
+        File prevConfig = project.file(FILENAME)
 
         if (prevConfig.exists()) {
-            def map = new HashMap<String, String>()
-            prevConfig.splitEachLine("=") {
-                map.put(it[0], it[1])
-            }
-            return !that.toMap().equals(map)
+            return toMap() != new JsonSlurper().parse(prevConfig)
         }
-
         return true
     }
 

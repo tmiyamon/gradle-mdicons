@@ -92,18 +92,19 @@ class MaterialDesignIconsPluginExtensionTest {
         def map = ext.toMap()
         assert map['cachePath'] == 'a'
         assert map['resourcePath'] == 'b'
-        assert map['patterns'] == ['c', 'd'].join(',')
+        assert map['patterns'] == ['c', 'd']
     }
 
     @Test
-    public void fromMap_returnCorrectObject() {
+    public void toJson_returnsFieldsJson() {
         ext.cachePath = 'a'
         ext.resourcePath = 'b'
         ext.pattern 'c'
         ext.pattern 'd'
 
-        assert ext == MaterialDesignIconsPluginExtension.fromMap(ext.toMap())
+        assert '{"cachePath":"a","resourcePath":"b","patterns":["c","d"]}', ext.toJson()
     }
+
 
     @Test
     public void buildPattern_returnsJoindPatternsWithPipe() {
