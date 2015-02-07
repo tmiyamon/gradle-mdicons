@@ -64,6 +64,14 @@ public class MaterialDesignIconsPluginExtension {
         }
     }
 
+    def getGroups() {
+        return groups
+    }
+
+    def getPatterns() {
+        return patterns
+    }
+
     public String buildPattern() {
         if (Utils.isNotEmpty(patterns)) {
             return "(${patterns.join("|")})"

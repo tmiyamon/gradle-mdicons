@@ -14,74 +14,6 @@ class MaterialDesignIconsPluginExtensionTest {
         ext = new MaterialDesignIconsPluginExtension()
     }
 
-
-    @Test
-    public void equals_worksWell() {
-        def ext1 = new MaterialDesignIconsPluginExtension()
-        def ext2 = new MaterialDesignIconsPluginExtension()
-        ext1.cachePath = 'a'
-        ext1.resourcePath = 'b'
-        ext1.pattern 'c'
-        ext1.pattern 'd'
-        ext2.cachePath = 'a'
-        ext2.resourcePath = 'b'
-        ext2.pattern 'c'
-        ext2.pattern 'd'
-
-        assert ext1 == ext2
-    }
-
-    @Test
-    public void equals_returnsTrueIfOrderOfPatternsIsDifferent() {
-        def ext1 = new MaterialDesignIconsPluginExtension()
-        def ext2 = new MaterialDesignIconsPluginExtension()
-        ext1.cachePath = 'a'
-        ext1.resourcePath = 'b'
-        ext1.pattern 'c'
-        ext1.pattern 'd'
-        ext2.cachePath = 'a'
-        ext2.resourcePath = 'b'
-        ext2.pattern 'd'
-        ext2.pattern 'c'
-
-        assert ext1 == ext2
-    }
-
-    @Test
-    public void equals_returnFalseIfPatternsAreDifferentSize() {
-        def ext1 = new MaterialDesignIconsPluginExtension()
-        def ext2 = new MaterialDesignIconsPluginExtension()
-        ext1.cachePath = 'a'
-        ext1.resourcePath = 'b'
-        ext1.pattern 'c'
-        ext1.pattern 'd'
-        ext2.cachePath = 'a'
-        ext2.resourcePath = 'b'
-        ext2.pattern 'd'
-        ext2.pattern 'c'
-        ext2.pattern 'e'
-
-        assert ext1 != ext2
-    }
-
-    @Test
-    public void equals_returnFalseIfPatternsHaveDifferentElements() {
-        def ext1 = new MaterialDesignIconsPluginExtension()
-        def ext2 = new MaterialDesignIconsPluginExtension()
-        ext1.cachePath = 'a'
-        ext1.resourcePath = 'b'
-        ext1.pattern 'c'
-        ext1.pattern 'd'
-        ext2.pattern 'f'
-        ext2.cachePath = 'a'
-        ext2.resourcePath = 'b'
-        ext2.pattern 'd'
-        ext2.pattern 'c'
-        ext2.pattern 'e'
-
-        assert ext1 != ext2
-    }
-
     @Test
     public void toMap_returnsFieldsMap() {
         ext.cachePath = 'a'
@@ -114,28 +46,28 @@ class MaterialDesignIconsPluginExtensionTest {
     public void group_addsGroupWithNonEmptyArguments() {
         ext.group name:'a', color:'b', size:'c'
 
-        assert ext.toMap()['groups'] == [[name:'a', color:'b', size:'c']]
+        assert ext.groups == [[name:'a', color:'b', size:'c']]
     }
 
     @Test
     public void group_ignoresWithMissingName() {
         ext.group color:'b', size:'c'
 
-        assert ext.toMap()['groups'] == []
+        assert ext.groups == []
     }
 
     @Test
     public void group_ignoresWithMissingColor() {
         ext.group name:'a', size:'c'
 
-        assert ext.toMap()['groups'] == []
+        assert ext.groups == []
     }
 
     @Test
     public void group_ignoresWithMissingSize() {
         ext.group name:'a', color:'b'
 
-        assert ext.toMap()['groups'] == []
+        assert ext.groups == []
     }
 
     @Test

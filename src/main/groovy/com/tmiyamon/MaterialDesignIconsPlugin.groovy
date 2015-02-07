@@ -19,8 +19,9 @@ public class MaterialDesignIconsPlugin implements Plugin<Project> {
 
         def cloneRepositoryTask = project.task('mdiconsCloneRepository')
         def cleanIconsTask = project.task('mdiconsCleanIcons', dependsOn: cloneRepositoryTask)
-        def copyIconsTask = project.task('mdiconsCopyIcons', dependsOn: [cloneRepositoryTask, cleanIconsTask])
-        def mainTask = project.task('mdicons', dependsOn: [copyIconsTask, cleanIconsTask, cloneRepositoryTask])
+        def copyIconsByPatternsTask = project.task('mdiconsCopyIconsByPatterns', dependsOn: [cloneRepositoryTask, cleanIconsTask])
+        def copyIconsByGroupsTask = project.task('mdiconsCopyIconsByGroups', dependsOn: [cloneRepositoryTask, cleanIconsTask])
+        def mainTask = project.task('mdicons', dependsOn: [copyIconsByPatternsTask, copyIconsByGroupsTask, cleanIconsTask, cloneRepositoryTask])
 
         project.plugins.withType(AppPlugin) {
             project.tasks.findByName("preBuild").dependsOn(mainTask)
@@ -33,6 +34,7 @@ public class MaterialDesignIconsPlugin implements Plugin<Project> {
             def configChanged = project.mdicons.isChanged(project)
             def cacheDir = new File(project.mdicons.cachePath);
             def pattern = project.mdicons.buildPattern()
+            def groups = project.mdicons.groups;
             def resourceDir = project.file(project.mdicons.resourcePath)
 
             def iconTypes = [
@@ -64,11 +66,7 @@ public class MaterialDesignIconsPlugin implements Plugin<Project> {
             }
 
             if (configChanged && cacheDir.isDirectory() && Utils.isNotEmpty(pattern)) {
-                copyIconsTask.doLast {
-                    if (!resourceDir.isDirectory()) {
-                        resourceDir.mkdir();
-                    }
-
+                copyIconsByPatternsTask.doLast {
                     eachIconFiles(cacheDir, iconTypes, pattern) { cachedIconFile ->
                         def projectTypedDrawableDir = new File(resourceDir, cachedIconFile.getParentFile().getName())
                         if (!projectTypedDrawableDir.isDirectory()) {
@@ -82,6 +80,12 @@ public class MaterialDesignIconsPlugin implements Plugin<Project> {
                             }
                         }
                     }
+                }
+            }
+
+            if (configChanged && cacheDir.isDirectory() && Utils.isNotEmpty(groups)) {
+                copyIconsByGroupsTask.doLast {
+
                 }
             }
 
