@@ -13,6 +13,7 @@ public class MaterialDesignIconsPluginExtension {
     String cachePath = "${System.getProperty("user.home")}/.material_design_icons"
     String resourcePath = 'src/main/res'
     private def patterns = [];
+    private def groups = []
 
     public MaterialDesignIconsPluginExtension() {}
 
@@ -20,7 +21,8 @@ public class MaterialDesignIconsPluginExtension {
         return [
             cachePath: cachePath,
             resourcePath: resourcePath,
-            patterns: patterns
+            patterns: patterns,
+            groups: groups
         ]
     }
 
@@ -52,6 +54,16 @@ public class MaterialDesignIconsPluginExtension {
         }
     }
 
+    public void group(Map<String, String> args) {
+        def required = args.subMap('name', 'color', 'size')
+        if (Utils.isNotEmpty(required['name']) &&
+                Utils.isNotEmpty(required['color']) &&
+                Utils.isNotEmpty(required['size'])) {
+
+            groups.add(required)
+        }
+    }
+
     public String buildPattern() {
         if (Utils.isNotEmpty(patterns)) {
             return "(${patterns.join("|")})"
@@ -59,34 +71,13 @@ public class MaterialDesignIconsPluginExtension {
         return null
     }
 
-
     @Override
     public String toString() {
         return "MaterialDesignIconsPluginExtension{" +
                 "cachePath='" + cachePath + '\'' +
                 ", resourcePath='" + resourcePath + '\'' +
                 ", patterns=" + patterns +
+                ", groups=" + groups +
                 '}';
-    }
-
-    boolean equals(o) {
-        if (this.is(o)) return true
-        if (getClass() != o.class) return false
-
-        MaterialDesignIconsPluginExtension that = (MaterialDesignIconsPluginExtension) o
-
-        if (cachePath != that.cachePath) return false
-        if (patterns.size() != that.patterns.size() || (patterns - that.patterns).size() != 0)  return false
-        if (resourcePath != that.resourcePath) return false
-
-        return true
-    }
-
-    int hashCode() {
-        int result
-        result = (cachePath != null ? cachePath.hashCode() : 0)
-        result = 31 * result + (resourcePath != null ? resourcePath.hashCode() : 0)
-        result = 31 * result + (patterns != null ? patterns.hashCode() : 0)
-        return result
     }
 }

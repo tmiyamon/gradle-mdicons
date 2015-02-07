@@ -88,11 +88,14 @@ class MaterialDesignIconsPluginExtensionTest {
         ext.resourcePath = 'b'
         ext.pattern 'c'
         ext.pattern 'd'
+        ext.group name: 'e', color: 'f', size: 'g'
+        ext.group name: 'h', color: 'i', size: 'j'
 
         def map = ext.toMap()
         assert map['cachePath'] == 'a'
         assert map['resourcePath'] == 'b'
         assert map['patterns'] == ['c', 'd']
+        assert map['groups'] == [[name: 'e', color: 'f', size: 'g'], [name: 'h', color:'i', size:'j']]
     }
 
     @Test
@@ -101,10 +104,39 @@ class MaterialDesignIconsPluginExtensionTest {
         ext.resourcePath = 'b'
         ext.pattern 'c'
         ext.pattern 'd'
+        ext.group name: 'e', color: 'f', size: 'g'
+        ext.group name: 'h', color: 'i', size: 'j'
 
-        assert '{"cachePath":"a","resourcePath":"b","patterns":["c","d"]}', ext.toJson()
+        assert '{"cachePath":"a","resourcePath":"b","patterns":["c","d"],"groups":[{"name":"e","color":"f","size":"g"},{"name":"h","color":"i","size":"j"}]', ext.toJson()
     }
 
+    @Test
+    public void group_addsGroupWithNonEmptyArguments() {
+        ext.group name:'a', color:'b', size:'c'
+
+        assert ext.toMap()['groups'] == [[name:'a', color:'b', size:'c']]
+    }
+
+    @Test
+    public void group_ignoresWithMissingName() {
+        ext.group color:'b', size:'c'
+
+        assert ext.toMap()['groups'] == []
+    }
+
+    @Test
+    public void group_ignoresWithMissingColor() {
+        ext.group name:'a', size:'c'
+
+        assert ext.toMap()['groups'] == []
+    }
+
+    @Test
+    public void group_ignoresWithMissingSize() {
+        ext.group name:'a', color:'b'
+
+        assert ext.toMap()['groups'] == []
+    }
 
     @Test
     public void buildPattern_returnsJoindPatternsWithPipe() {
