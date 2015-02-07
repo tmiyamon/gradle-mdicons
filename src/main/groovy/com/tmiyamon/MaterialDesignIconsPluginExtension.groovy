@@ -36,7 +36,12 @@ public class MaterialDesignIconsPluginExtension {
         File prevConfig = project.file(FILENAME)
 
         if (prevConfig.exists()) {
-            return toMap() != new JsonSlurper().parse(prevConfig)
+            try {
+                return toMap() != new JsonSlurper().parse(prevConfig)
+            } catch (Exception e) {
+                project.logger.warn("Ignore previous configuration for mdicons due to its corruption.")
+                return true
+            }
         }
         return true
     }
