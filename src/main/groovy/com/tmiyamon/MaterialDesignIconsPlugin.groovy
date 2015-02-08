@@ -3,6 +3,7 @@ package com.tmiyamon
 import bsh.StringUtil
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
+import groovy.io.FileType
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -34,7 +35,6 @@ public class MaterialDesignIconsPlugin implements Plugin<Project> {
             def configChanged = project.mdicons.isChanged(project)
             def cacheDir = new File(project.mdicons.cachePath);
             def pattern = project.mdicons.buildPattern()
-            def groups = project.mdicons.groups;
             def resourceDir = project.file(project.mdicons.resourcePath)
 
             def iconTypes = [
@@ -83,9 +83,49 @@ public class MaterialDesignIconsPlugin implements Plugin<Project> {
                 }
             }
 
+            def groups = project.mdicons.groups as List
             if (configChanged && cacheDir.isDirectory() && Utils.isNotEmpty(groups)) {
                 copyIconsByGroupsTask.doLast {
+                    def predefinedColor = ['white', 'black', 'grey600'] as Set<String>
+                    def searchPattern = groups.collect({ Map group -> ".*(${group['name']}).*_white_${group['size']}\\.png" }).join('|')
+                    project.logger.debug("[mdicons:$name] searchPattern for groups: ${searchPattern}")
 
+                    eachIconFiles(cacheDir) { Map<String, String> iconData ->
+                        def iconType = iconData['type']
+                        def iconName = iconData['name']
+
+                        if (iconName =~ searchPattern) {
+                            groups.each { Map group ->
+                                if (iconName =~ ".*(${group['name']}).*_white_${group['size']}") {
+                                    ['drawable-mdpi',
+                                     'drawable-hdpi',
+                                     'drawable-xhdpi',
+                                     'drawable-xxhdpi',
+                                     'drawable-xxxhdpi'
+                                    ].each { String density ->
+
+                                        def matchedIconFile = iconFile(cacheDir, iconType, density, iconName)
+                                        def targetIconFile = new File(matchedIconFile.absolutePath.replace('white', group['color']))
+
+                                        if(!targetIconFile.isFile()) {
+                                            def cmd = "/usr/local/bin/convert ${matchedIconFile.absolutePath} -fuzz 75% -fill ${group['color']} -opaque white -type TruecolorMatte PNG32:${targetIconFile.absolutePath}"
+                                            def proc =  cmd.execute()
+                                            proc.waitFor()
+                                            project.logger.debug(cmd)
+                                            project.logger.debug("return code: ${ proc.exitValue()}")
+                                            project.logger.debug("stderr: ${proc.err.text}")
+                                            project.logger.debug("stdout: ${proc.in.text}")
+                                        }
+
+                                        project.copy {
+                                            from targetIconFile
+                                            into new File(resourceDir, density)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
@@ -93,6 +133,23 @@ public class MaterialDesignIconsPlugin implements Plugin<Project> {
                 project.mdicons.save(project)
             }
         }
+    }
+
+    def eachIconFiles(File root, Closure closure) {
+        def iconTypes = [
+            'action','alert','av','communication','content','device',
+            'editor','file','hardware','image','maps','navigation',
+            'notification','social','toggle'
+        ]
+        iconTypes.each { String iconType ->
+            new File(root, "${iconType}/drawable-mdpi").eachFile { File icon ->
+                closure( type: iconType, name: icon.name )
+            }
+        }
+    }
+
+    def iconFile(File root, String iconType, String density, String iconName) {
+        new File(root, "${iconType}/${density}/${iconName}")
     }
 
     /**
