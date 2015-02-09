@@ -110,13 +110,38 @@ public class MaterialDesignIconsPlugin implements Plugin<Project> {
                     def searchPattern = groups.collect({ Map group -> ".*(${group['name']}).*_white_${group['size']}\\.png" }).join('|')
                     project.logger.debug("[mdicons:$name] searchPattern for groups: ${searchPattern}")
 
-                    eachIconFiles(cacheDir) { Map<String, String> iconData ->
-                        def iconType = iconData['type']
-                        def iconName = iconData['name']
+                    eachIconFiles(cacheDir) { Map iconData ->
+                        def iconType = iconData['type'] as String
+                        def iconName = iconData['name'] as String
 
                         if (iconName =~ searchPattern) {
-                            groups.each { Map group ->
-                                if (iconName =~ ".*(${group['name']}).*_white_${group['size']}") {
+                            groups.each { Map<String, String> group ->
+                                if (iconName =~ ".*(${group['name']}).*_${Icon.CANONICAL_COLOR}_${group['size']}") {
+
+//                                    def canonicalIcon = Icon.from(iconData['file'] as File)
+//                                    def tintIcon = canonicalIcon.newWithColor(group['color'])
+//
+//                                    canonicalIcon.getVariantFiles(new File(cacheDir, iconType)).each { File variantFile ->
+//                                        def tintIconFile = tintIcon.getFile(variantFile.parentFile)
+//                                        if(!tintIconFile.isFile()) {
+//                                            def cmd = "/usr/local/bin/convert ${variantFile.absolutePath} -fuzz 75% -fill ${tintIcon.color} -opaque white -type TruecolorMatte PNG32:${tintIconFile.absolutePath}"
+//                                            def proc =  cmd.execute()
+//                                            proc.waitFor()
+//                                            project.logger.debug(cmd)
+//                                            project.logger.debug("return code: ${ proc.exitValue()}")
+//                                            project.logger.debug("stderr: ${proc.err.text}")
+//                                            project.logger.debug("stdout: ${proc.in.text}")
+//                                        }
+//                                    }
+//
+//                                    [
+//                                        tintIcon.getVariantFiles(new File(cacheDir, iconType)),
+//                                        tintIcon.getVariantFiles(resourceDir)
+//                                    ].transpose().each { from, into ->
+//                                        from from
+//                                        into into
+//                                    }
+
                                     densities.each { String density ->
 
                                         def matchedIconFile = iconFile(cacheDir, iconType, density, iconName)
@@ -153,7 +178,7 @@ public class MaterialDesignIconsPlugin implements Plugin<Project> {
     def eachIconFiles(File root, Closure closure) {
         ICON_CATEGORIES.each { String iconType ->
             new File(root, "${iconType}/drawable-mdpi").eachFile { File icon ->
-                closure( type: iconType, name: icon.name )
+                closure( type: iconType, name: icon.name, file: icon )
             }
         }
     }

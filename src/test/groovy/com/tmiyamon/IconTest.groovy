@@ -39,11 +39,25 @@ class IconTest {
     }
 
     @Test
+    void file_returnsFile() {
+        assert new File('/tmp/a_a_a_b_c.d') == Icon.from(new File('a_a_a_b_c.d')).getFile(new File('/tmp'))
+    }
+
+    @Test
     void variantFiles_returnsVariantFiles() {
         def name = 'a_a_a_b_c.d'
         def expect = Icon.DENSITIES.collect { "/drawable-${it}/${name}"}
         def actual = Icon.from(new File(name)).getVariantFiles(new File('/')).collect {it.absolutePath}
         assert expect == actual
+    }
+
+    @Test
+    void newWithColor_returnsIconWithNewColor() {
+        def icon = Icon.from('a_a_a','b','c', 'd').newWithColor("e")
+        assert icon.name == 'a_a_a'
+        assert icon.color == 'e'
+        assert icon.size == 'c'
+        assert icon.ext == 'd'
     }
 
     @Test

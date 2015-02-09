@@ -31,12 +31,19 @@ class Icon {
         "${name}_${color}_${size}.${ext}"
     }
 
+    def getFile(File root) {
+        new File(root, fileName)
+    }
+
     def getVariantFiles(File root) {
         DENSITIES.collect { new File(root, "drawable-${it}/${fileName}")}
     }
 
-    def getCanonical() {
-        new Icon(name, CANONICAL_COLOR, size, ext)
+    def newWithColor(String newColor) {
+        from(name, newColor, size, ext)
     }
 
+    def getCanonical() {
+        from(name, CANONICAL_COLOR, size, ext)
+    }
 }
