@@ -14,6 +14,11 @@ import org.gradle.api.plugins.ApplicationPlugin
  */
 
 public class MaterialDesignIconsPlugin implements Plugin<Project> {
+    static def ICON_CATEGORIES = [
+            'action','alert','av','communication','content','device',
+            'editor','file','hardware','image','maps','navigation',
+            'notification','social','toggle'
+    ]
     @Override
     void apply(Project project) {
         project.extensions.create("mdicons", MaterialDesignIconsPluginExtension)
@@ -43,6 +48,14 @@ public class MaterialDesignIconsPlugin implements Plugin<Project> {
                 'notification','social','toggle'
             ] as Set
 
+            def densities = [
+                    'drawable-mdpi',
+                    'drawable-hdpi',
+                    'drawable-xhdpi',
+                    'drawable-xxhdpi',
+                    'drawable-xxxhdpi'
+            ]
+
             if (!cacheDir.isDirectory()) {
                 def repoUrl = 'git@github.com:google/material-design-icons.git'
 
@@ -54,12 +67,20 @@ public class MaterialDesignIconsPlugin implements Plugin<Project> {
 
             if (configChanged && cacheDir.isDirectory()) {
                 cleanIconsTask.doLast {
-                    eachIconFiles(cacheDir, iconTypes, null) { cachedIconFile ->
-                        def projectTypedDrawableDir = new File(resourceDir, cachedIconFile.getParentFile().getName())
+                    def iconMapping = [:].withDefault {[]}
+                    new File(resourceDir, "drawable-mdpi").eachFile { File f ->
+                        def icon = Icon.from(f)
+                        if (icon != null) {
+                            iconMapping[icon.canonical.fileName] << icon
+                        }
+                    }
 
-                        def projectResourceFile = new File(projectTypedDrawableDir, cachedIconFile.getName())
-                        if (projectResourceFile.exists()) {
-                            projectResourceFile.delete()
+                    eachIconFiles(cacheDir) { Map<String, String> iconData ->
+                        def iconName = iconData['name']
+                        iconMapping[iconName].each { Icon icon ->
+                            icon.getVariantFiles(resourceDir).each { File iconFileInProject ->
+                                iconFileInProject.delete()
+                            }
                         }
                     }
                 }
@@ -86,7 +107,6 @@ public class MaterialDesignIconsPlugin implements Plugin<Project> {
             def groups = project.mdicons.groups as List
             if (configChanged && cacheDir.isDirectory() && Utils.isNotEmpty(groups)) {
                 copyIconsByGroupsTask.doLast {
-                    def predefinedColor = ['white', 'black', 'grey600'] as Set<String>
                     def searchPattern = groups.collect({ Map group -> ".*(${group['name']}).*_white_${group['size']}\\.png" }).join('|')
                     project.logger.debug("[mdicons:$name] searchPattern for groups: ${searchPattern}")
 
@@ -97,12 +117,7 @@ public class MaterialDesignIconsPlugin implements Plugin<Project> {
                         if (iconName =~ searchPattern) {
                             groups.each { Map group ->
                                 if (iconName =~ ".*(${group['name']}).*_white_${group['size']}") {
-                                    ['drawable-mdpi',
-                                     'drawable-hdpi',
-                                     'drawable-xhdpi',
-                                     'drawable-xxhdpi',
-                                     'drawable-xxxhdpi'
-                                    ].each { String density ->
+                                    densities.each { String density ->
 
                                         def matchedIconFile = iconFile(cacheDir, iconType, density, iconName)
                                         def targetIconFile = new File(matchedIconFile.absolutePath.replace('white', group['color']))
@@ -136,12 +151,7 @@ public class MaterialDesignIconsPlugin implements Plugin<Project> {
     }
 
     def eachIconFiles(File root, Closure closure) {
-        def iconTypes = [
-            'action','alert','av','communication','content','device',
-            'editor','file','hardware','image','maps','navigation',
-            'notification','social','toggle'
-        ]
-        iconTypes.each { String iconType ->
+        ICON_CATEGORIES.each { String iconType ->
             new File(root, "${iconType}/drawable-mdpi").eachFile { File icon ->
                 closure( type: iconType, name: icon.name )
             }
@@ -151,6 +161,7 @@ public class MaterialDesignIconsPlugin implements Plugin<Project> {
     def iconFile(File root, String iconType, String density, String iconName) {
         new File(root, "${iconType}/${density}/${iconName}")
     }
+
 
     /**
      * Traverse material design icons repository.
