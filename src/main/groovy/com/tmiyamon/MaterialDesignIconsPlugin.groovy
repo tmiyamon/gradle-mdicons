@@ -10,11 +10,6 @@ import org.gradle.api.Project
  */
 
 public class MaterialDesignIconsPlugin implements Plugin<Project> {
-    static def ICON_CATEGORIES = [
-            'action','alert','av','communication','content','device',
-            'editor','file','hardware','image','maps','navigation',
-            'notification','social','toggle'
-    ]
     @Override
     void apply(Project project) {
         project.extensions.create("mdicons", MaterialDesignIconsPluginExtension)
@@ -44,14 +39,6 @@ public class MaterialDesignIconsPlugin implements Plugin<Project> {
                 'notification','social','toggle'
             ] as Set
 
-            def densities = [
-                    'drawable-mdpi',
-                    'drawable-hdpi',
-                    'drawable-xhdpi',
-                    'drawable-xxhdpi',
-                    'drawable-xxxhdpi'
-            ]
-
             if (!cacheDir.isDirectory()) {
                 def repoUrl = 'git@github.com:google/material-design-icons.git'
 
@@ -63,11 +50,11 @@ public class MaterialDesignIconsPlugin implements Plugin<Project> {
 
             if (configChanged && cacheDir.isDirectory()) {
                 cleanIconsTask.doLast {
-                    Map<String, List<IconFile>> iconMapping = [:].withDefault {[]}
-                    IconFile.eachProjectResourceIcons(resourceDir) { IconFile icon ->
+                    Map<String, List<Icon>> iconMapping = [:].withDefault {[]}
+                    Icon.eachProjectResourceIcons(resourceDir) { Icon icon ->
                         iconMapping[icon.newCanonical().fileName] << icon
                     }
-                    IconFile.eachCacheCanonicalIcons(cacheDir) { IconFile icon ->
+                    Icon.eachCacheCanonicalIcons(cacheDir) { Icon icon ->
                         iconMapping[icon.fileName].each {
                             it.getProjectResourceVariantFiles(resourceDir).each { it.delete() }
                         }
@@ -98,7 +85,7 @@ public class MaterialDesignIconsPlugin implements Plugin<Project> {
                 copyIconsByGroupsTask.doLast {
                     def iconGroups = groups.collect { new IconGroup(it) }
 
-                    IconFile.eachCacheCanonicalIconsMatchedToGroups(cacheDir, iconGroups) { IconFile canonicalIcon ->
+                    Icon.eachCacheCanonicalIconsMatchedToGroups(cacheDir, iconGroups) { Icon canonicalIcon ->
                         iconGroups.each { IconGroup iconGroup ->
                             if (canonicalIcon.fileName =~ iconGroup.canonicalPattern) {
                                 canonicalIcon.variants.each {
@@ -123,43 +110,6 @@ public class MaterialDesignIconsPlugin implements Plugin<Project> {
             }
         }
     }
-
-//    def eachIconFiles(File root, Closure closure) {
-//        ICON_CATEGORIES.each { String category ->
-//            new File(root, "${category}/drawable-mdpi").eachFile { File iconFile ->
-//                //closure( type: iconType, name: icon.name, file: icon )
-//                closure(category, name, iconFile)
-//            }
-//        }
-//    }
-
-    def eachCanonicalIconFiles(File root, Closure closure) {
-        ICON_CATEGORIES.each {
-            new File(root, "${it}/drawable-mdpi").eachFile { File iconFile ->
-                //closure( type: iconType, name: icon.name, file: icon )
-                closure(category, name, iconFile)
-            }
-        }
-    }
-
-    def eachIconsAnyMatchedToGroups(File root, List<IconGroup> iconGroups, Closure closure) {
-        def canonicalPatternForAllGroups = iconGroups.collect({ it.canonicalPattern }).join('|')
-        eachIconFiles(root)  { String category, String name, File iconFile ->
-            if (name =~ canonicalPatternForAllGroups) {
-                closure(iconFile)
-            }
-        }
-
-    }
-
-    def iconFile(File root, String iconType, String density, String iconName) {
-        new File(root, "${iconType}/${density}/${iconName}")
-    }
-
-    def canonicalPatternFor(Map<String, String> group) {
-        ".*(${group['name']}).*_${Icon.CANONICAL_COLOR}_${group['size']}"
-    }
-
 
     /**
      * Traverse material design icons repository.
