@@ -44,7 +44,6 @@ class Icon {
 
     static def eachCacheCanonicalIconsMatchedToGroups(File cacheDir, List<IconGroup> iconGroups, Closure closure)  {
         def pattern = iconGroups.collect { it.canonicalPattern }.join("|")
-        println(pattern)
         eachCacheCanonicalIcons(cacheDir) { Icon icon ->
             if (icon.fileName =~ pattern) {
                 closure(icon)
@@ -130,7 +129,8 @@ class Icon {
 
     def generateCache(File cacheDir) {
         def canonicalColorIcon = newWithColor(CANONICAL_COLOR)
-        def cmd = "/usr/local/bin/convert ${canonicalColorIcon.getCacheFile(cacheDir)} -fuzz 75% -fill ${color} -opaque white -type TruecolorMatte PNG32:${getCacheFile(cacheDir)}"
+        def colorHex = MaterialColor.instance.getHexFrom(color)
+        def cmd = "/usr/local/bin/convert ${canonicalColorIcon.getCacheFile(cacheDir)} -fuzz 75% -fill ${colorHex} -opaque white -type TruecolorMatte PNG32:${getCacheFile(cacheDir)}"
         cmd.execute().waitFor()
     }
 
