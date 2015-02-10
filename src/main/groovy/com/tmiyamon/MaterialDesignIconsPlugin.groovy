@@ -1,13 +1,9 @@
 package com.tmiyamon
 
-import bsh.StringUtil
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
-import groovy.io.FileType
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.Task
-import org.gradle.api.plugins.ApplicationPlugin
 
 /**
  * Created by tmiyamon on 12/24/14.
@@ -67,20 +63,13 @@ public class MaterialDesignIconsPlugin implements Plugin<Project> {
 
             if (configChanged && cacheDir.isDirectory()) {
                 cleanIconsTask.doLast {
-                    def iconMapping = [:].withDefault {[]}
-                    new File(resourceDir, "drawable-mdpi").eachFile { File f ->
-                        def icon = Icon.from(f)
-                        if (icon != null) {
-                            iconMapping[icon.canonical.fileName] << icon
-                        }
+                    Map<String, List<IconFile>> iconMapping = [:].withDefault {[]}
+                    IconFile.eachProjectResourceIcons(resourceDir) { IconFile icon ->
+                        iconMapping[icon.newCanonical().fileName] << icon
                     }
-
-                    eachIconFiles(cacheDir) { Map<String, String> iconData ->
-                        def iconName = iconData['name']
-                        iconMapping[iconName].each { Icon icon ->
-                            icon.getVariantFiles(resourceDir).each { File iconFileInProject ->
-                                iconFileInProject.delete()
-                            }
+                    IconFile.eachCacheCanonicalIcons(cacheDir) { IconFile icon ->
+                        iconMapping[icon.fileName].each {
+                            it.getProjectResourceVariantFiles(resourceDir).each { it.delete() }
                         }
                     }
                 }
@@ -104,63 +93,23 @@ public class MaterialDesignIconsPlugin implements Plugin<Project> {
                 }
             }
 
-            def groups = project.mdicons.groups as List
+            List<Map<String, String>> groups = project.mdicons.groups
             if (configChanged && cacheDir.isDirectory() && Utils.isNotEmpty(groups)) {
                 copyIconsByGroupsTask.doLast {
-                    def searchPattern = groups.collect({ Map group -> ".*(${group['name']}).*_white_${group['size']}\\.png" }).join('|')
-                    project.logger.debug("[mdicons:$name] searchPattern for groups: ${searchPattern}")
+                    def iconGroups = groups.collect { new IconGroup(it) }
 
-                    eachIconFiles(cacheDir) { Map iconData ->
-                        def iconType = iconData['type'] as String
-                        def iconName = iconData['name'] as String
+                    IconFile.eachCacheCanonicalIconsMatchedToGroups(cacheDir, iconGroups) { IconFile canonicalIcon ->
+                        iconGroups.each { IconGroup iconGroup ->
+                            if (canonicalIcon.fileName =~ iconGroup.canonicalPattern) {
+                                canonicalIcon.variants.each {
+                                    def tintIcon = it.newWithColor(iconGroup.color)
+                                    if (!tintIcon.isCacheExists(cacheDir)) {
+                                        tintIcon.generateCache(cacheDir)
+                                    }
 
-                        if (iconName =~ searchPattern) {
-                            groups.each { Map<String, String> group ->
-                                if (iconName =~ ".*(${group['name']}).*_${Icon.CANONICAL_COLOR}_${group['size']}") {
-
-//                                    def canonicalIcon = Icon.from(iconData['file'] as File)
-//                                    def tintIcon = canonicalIcon.newWithColor(group['color'])
-//
-//                                    canonicalIcon.getVariantFiles(new File(cacheDir, iconType)).each { File variantFile ->
-//                                        def tintIconFile = tintIcon.getFile(variantFile.parentFile)
-//                                        if(!tintIconFile.isFile()) {
-//                                            def cmd = "/usr/local/bin/convert ${variantFile.absolutePath} -fuzz 75% -fill ${tintIcon.color} -opaque white -type TruecolorMatte PNG32:${tintIconFile.absolutePath}"
-//                                            def proc =  cmd.execute()
-//                                            proc.waitFor()
-//                                            project.logger.debug(cmd)
-//                                            project.logger.debug("return code: ${ proc.exitValue()}")
-//                                            project.logger.debug("stderr: ${proc.err.text}")
-//                                            project.logger.debug("stdout: ${proc.in.text}")
-//                                        }
-//                                    }
-//
-//                                    [
-//                                        tintIcon.getVariantFiles(new File(cacheDir, iconType)),
-//                                        tintIcon.getVariantFiles(resourceDir)
-//                                    ].transpose().each { from, into ->
-//                                        from from
-//                                        into into
-//                                    }
-
-                                    densities.each { String density ->
-
-                                        def matchedIconFile = iconFile(cacheDir, iconType, density, iconName)
-                                        def targetIconFile = new File(matchedIconFile.absolutePath.replace('white', group['color']))
-
-                                        if(!targetIconFile.isFile()) {
-                                            def cmd = "/usr/local/bin/convert ${matchedIconFile.absolutePath} -fuzz 75% -fill ${group['color']} -opaque white -type TruecolorMatte PNG32:${targetIconFile.absolutePath}"
-                                            def proc =  cmd.execute()
-                                            proc.waitFor()
-                                            project.logger.debug(cmd)
-                                            project.logger.debug("return code: ${ proc.exitValue()}")
-                                            project.logger.debug("stderr: ${proc.err.text}")
-                                            project.logger.debug("stdout: ${proc.in.text}")
-                                        }
-
-                                        project.copy {
-                                            from targetIconFile
-                                            into new File(resourceDir, density)
-                                        }
+                                    project.copy {
+                                        from tintIcon.getCacheFile(cacheDir)
+                                        into tintIcon.getProjectResourceFile(resourceDir).parentFile
                                     }
                                 }
                             }
@@ -175,16 +124,40 @@ public class MaterialDesignIconsPlugin implements Plugin<Project> {
         }
     }
 
-    def eachIconFiles(File root, Closure closure) {
-        ICON_CATEGORIES.each { String iconType ->
-            new File(root, "${iconType}/drawable-mdpi").eachFile { File icon ->
-                closure( type: iconType, name: icon.name, file: icon )
+//    def eachIconFiles(File root, Closure closure) {
+//        ICON_CATEGORIES.each { String category ->
+//            new File(root, "${category}/drawable-mdpi").eachFile { File iconFile ->
+//                //closure( type: iconType, name: icon.name, file: icon )
+//                closure(category, name, iconFile)
+//            }
+//        }
+//    }
+
+    def eachCanonicalIconFiles(File root, Closure closure) {
+        ICON_CATEGORIES.each {
+            new File(root, "${it}/drawable-mdpi").eachFile { File iconFile ->
+                //closure( type: iconType, name: icon.name, file: icon )
+                closure(category, name, iconFile)
             }
         }
     }
 
+    def eachIconsAnyMatchedToGroups(File root, List<IconGroup> iconGroups, Closure closure) {
+        def canonicalPatternForAllGroups = iconGroups.collect({ it.canonicalPattern }).join('|')
+        eachIconFiles(root)  { String category, String name, File iconFile ->
+            if (name =~ canonicalPatternForAllGroups) {
+                closure(iconFile)
+            }
+        }
+
+    }
+
     def iconFile(File root, String iconType, String density, String iconName) {
         new File(root, "${iconType}/${density}/${iconName}")
+    }
+
+    def canonicalPatternFor(Map<String, String> group) {
+        ".*(${group['name']}).*_${Icon.CANONICAL_COLOR}_${group['size']}"
     }
 
 

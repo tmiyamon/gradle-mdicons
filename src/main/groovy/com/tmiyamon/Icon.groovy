@@ -7,12 +7,9 @@ class Icon {
     static def DENSITIES = [ 'mdpi', 'hdpi', 'xhdpi', 'xxhdpi', 'xxxhdpi' ]
     static def CANONICAL_COLOR = 'white'
 
-    static Icon from(String name, String color, String size, String ext) {
-        return new Icon(name, color, size, ext)
-    }
     static Icon from(File file) {
         def m = (file.name =~ /(.+)_([^_]+)_([^_]+)\.(.+)/)
-        m.matches() ? from(*m[0][1..-1]) : null;
+        m.matches() ? new Icon(*m[0][1..-1]) : null;
     }
 
     String name
@@ -20,7 +17,7 @@ class Icon {
     String size
     String ext
 
-    Icon(String name, String color, String size, String ext) {
+    private Icon(String name, String color, String size, String ext) {
         this.name = name
         this.color = color
         this.size = size
@@ -31,19 +28,27 @@ class Icon {
         "${name}_${color}_${size}.${ext}"
     }
 
-    def getFile(File root) {
-        new File(root, fileName)
+    def getFile(File parent) {
+        new File(parent, fileName)
     }
 
-    def getVariantFiles(File root) {
-        DENSITIES.collect { new File(root, "drawable-${it}/${fileName}")}
+    def getVariantFiles(File variantRoot) {
+        DENSITIES.collect { new File(variantRoot, "drawable-${it}/${fileName}")}
+    }
+
+    def eachVariantFiles(File variantRoot, Closure closure) {
+        DENSITIES.each { closure(it, new File(variantRoot, "drawable-${it}/${fileName}")) }
     }
 
     def newWithColor(String newColor) {
-        from(name, newColor, size, ext)
+        new Icon(name, newColor, size, ext)
     }
 
     def getCanonical() {
-        from(name, CANONICAL_COLOR, size, ext)
+        newWithColor(CANONICAL_COLOR)
+    }
+
+    def isCanonical() {
+        this.color == CANONICAL_COLOR
     }
 }
