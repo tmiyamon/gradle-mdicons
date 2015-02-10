@@ -146,4 +146,31 @@ class Icon {
                 ", ext='" + ext + '\'' +
                 '}';
     }
+
+    boolean equals(o) {
+        if (this.is(o)) return true
+        if (getClass() != o.class) return false
+
+        Icon icon = (Icon) o
+
+        if (category != icon.category) return false
+        if (color != icon.color) return false
+        if (density != icon.density) return false
+        if (ext != icon.ext) return false
+        if (name != icon.name) return false
+        if (size != icon.size) return false
+
+        return true
+    }
+
+    int hashCode() {
+        int result
+        result = (category != null ? category.hashCode() : 0)
+        result = 31 * result + (density != null ? density.hashCode() : 0)
+        result = 31 * result + (name != null ? name.hashCode() : 0)
+        result = 31 * result + (color != null ? color.hashCode() : 0)
+        result = 31 * result + (size != null ? size.hashCode() : 0)
+        result = 31 * result + (ext != null ? ext.hashCode() : 0)
+        return result
+    }
 }

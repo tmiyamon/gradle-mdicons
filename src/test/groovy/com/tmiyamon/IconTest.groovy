@@ -1,71 +1,112 @@
 package com.tmiyamon
 
+import org.junit.Before
 import org.junit.Test
 
 /**
  * Created by tmiyamon on 2/10/15.
  */
 class IconTest {
-    @Test
-    void constructor_buildsIcon() {
-        def icon = new Icon('a_a_a','b','c', 'd')
-        assert icon.name == 'a_a_a'
-        assert icon.color == 'b'
-        assert icon.size == 'c'
-        assert icon.ext == 'd'
+    Icon icon
+    File cacheDir
+    File resourceDir
+
+    @Before
+    void beforeEach() {
+        icon = new Icon('category', 'density', 'name', 'color', 'size', 'ext')
+        cacheDir = new File('/cacheDir')
+        resourceDir = new File('/resourceDir')
     }
 
     @Test
-    void from_buildsIcon() {
-        def icon = Icon.from('a_a_a','b','c', 'd')
-        assert icon.name == 'a_a_a'
-        assert icon.color == 'b'
-        assert icon.size == 'c'
-        assert icon.ext == 'd'
+    void fileName_returnsBuiltFileName() {
+        assert "name_color_size.ext" == icon.fileName
     }
 
     @Test
-    void from_buildsIconWithFile() {
-        def icon = Icon.from(new File('/tmp/a_a_a_b_c.d'))
-        assert icon.name == 'a_a_a'
-        assert icon.color == 'b'
-        assert icon.size == 'c'
-        assert icon.ext == 'd'
+    void variants_returnsVariants() {
+        def expect = [
+            icon.newWithDensity('drawable-mdpi'),
+            icon.newWithDensity('drawable-hdpi'),
+            icon.newWithDensity('drawable-xhdpi'),
+            icon.newWithDensity('drawable-xxhdpi'),
+            icon.newWithDensity('drawable-xxxhdpi')
+        ]
+        assert expect == icon.variants
     }
 
     @Test
-    void fileName_returnsFileName() {
-        assert 'a_a_a_b_c.d' == Icon.from(new File('a_a_a_b_c.d')).fileName
+    void getCacheFile_returnsTheFileInCacheDirForTheIcon() {
+        assert new File(cacheDir, "category/density/name_color_size.ext") == icon.getCacheFile(cacheDir)
     }
 
     @Test
-    void file_returnsFile() {
-        assert new File('/tmp/a_a_a_b_c.d') == Icon.from(new File('a_a_a_b_c.d')).getFile(new File('/tmp'))
+    void getCacheVariantFiles_returnsTheVariantFilesInCacheDirForTheIcon() {
+        def expect = [
+                icon.newWithDensity('drawable-mdpi').getCacheFile(cacheDir),
+                icon.newWithDensity('drawable-hdpi').getCacheFile(cacheDir),
+                icon.newWithDensity('drawable-xhdpi').getCacheFile(cacheDir),
+                icon.newWithDensity('drawable-xxhdpi').getCacheFile(cacheDir),
+                icon.newWithDensity('drawable-xxxhdpi').getCacheFile(cacheDir)
+        ]
+        assert expect == icon.getCacheVariantFiles(cacheDir)
     }
 
     @Test
-    void variantFiles_returnsVariantFiles() {
-        def name = 'a_a_a_b_c.d'
-        def expect = Icon.DENSITIES.collect { "/drawable-${it}/${name}"}
-        def actual = Icon.from(new File(name)).getVariantFiles(new File('/')).collect {it.absolutePath}
-        assert expect == actual
+    void getProjectResourceFile_returnsTheFileInProjectResourceDirForTheIcon() {
+        assert new File(resourceDir, "density/name_color_size.ext") == icon.getProjectResourceFile(resourceDir)
     }
 
     @Test
-    void newWithColor_returnsIconWithNewColor() {
-        def icon = Icon.from('a_a_a','b','c', 'd').newWithColor("e")
-        assert icon.name == 'a_a_a'
-        assert icon.color == 'e'
-        assert icon.size == 'c'
-        assert icon.ext == 'd'
+    void getProjectResourceVariantFiles_returnsTheVariantFilesInProjectResourceDirForTheIcon() {
+        def expect = [
+                icon.newWithDensity('drawable-mdpi').getProjectResourceFile(resourceDir),
+                icon.newWithDensity('drawable-hdpi').getProjectResourceFile(resourceDir),
+                icon.newWithDensity('drawable-xhdpi').getProjectResourceFile(resourceDir),
+                icon.newWithDensity('drawable-xxhdpi').getProjectResourceFile(resourceDir),
+                icon.newWithDensity('drawable-xxxhdpi').getProjectResourceFile(resourceDir)
+        ]
+        assert expect == icon.getProjectResourceVariantFiles(resourceDir)
     }
 
     @Test
-    void canonical_returnsCanonical() {
-        def icon = Icon.from(new File('a_a_a_b_c.d')).canonical
-        assert 'a_a_a' == icon.name
-        assert Icon.CANONICAL_COLOR == icon.color
-        assert 'c' == icon.size
-        assert 'd' == icon.ext
+    void newCanonical_returnsCanonicalIconForTheIcon() {
+        assert icon.newWithColor(Icon.CANONICAL_COLOR).newWithDensity(Icon.CANONICAL_DENSITY) == icon.newCanonical()
+    }
+
+    @Test
+    void newWithColor_returnsNewIconWithColor() {
+        def actual = icon.newWithColor('test')
+        icon.color = 'test'
+        assert icon == actual
+    }
+
+    @Test
+    void newWithDensity_returnsNewIconWithDensity() {
+        def actual = icon.newWithDensity('test')
+        icon.density = 'test'
+        assert icon == actual
+    }
+
+    @Test
+    void isCanonicalColor_returnsTrueIfColorOfIconIsCanonical() {
+        icon.color = Icon.CANONICAL_COLOR
+        assert icon.isCanonicalColor()
+    }
+
+    @Test
+    void isCanonicalColor_returnsFalseIfColorOfIconIsNotCanonical() {
+        assert !icon.isCanonicalColor()
+    }
+
+    @Test
+    void isCanonicalDensity_returnsTrueIfDensityOfIconIsCanonical() {
+        icon.density = Icon.CANONICAL_DENSITY
+        assert icon.isCanonicalDensity()
+    }
+
+    @Test
+    void isCanonicalDensity_returnsFalseIfDensityOfIconIsNotCanonical() {
+        assert !icon.isCanonicalDensity()
     }
 }
