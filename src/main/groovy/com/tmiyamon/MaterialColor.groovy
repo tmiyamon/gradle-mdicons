@@ -11,7 +11,7 @@ class MaterialColor {
 
     def colors
     private MaterialColor() {
-        getClass().getClassLoader().getResourceAsStream(FILE_NAME).withStream {
+        getClass().classLoader.getResourceAsStream(FILE_NAME).withStream {
             colors = new JsonSlurper().parse(it)
         }
     }

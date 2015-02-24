@@ -33,12 +33,6 @@ public class MaterialDesignIconsPlugin implements Plugin<Project> {
             def pattern = project.mdicons.buildPattern()
             def resourceDir = project.file(project.mdicons.resourcePath)
 
-            def iconTypes = [
-                'action','alert','av','communication','content','device',
-                'editor','file','hardware','image','maps','navigation',
-                'notification','social','toggle'
-            ] as Set
-
             if (!cacheDir.isDirectory()) {
                 def repoUrl = 'git@github.com:google/material-design-icons.git'
 
@@ -64,7 +58,7 @@ public class MaterialDesignIconsPlugin implements Plugin<Project> {
 
             if (configChanged && cacheDir.isDirectory() && Utils.isNotEmpty(pattern)) {
                 copyIconsByPatternsTask.doLast {
-                    eachIconFiles(cacheDir, iconTypes, pattern) { cachedIconFile ->
+                    eachIconFiles(cacheDir, Icon.CATEGORIES, pattern) { cachedIconFile ->
                         def projectTypedDrawableDir = new File(resourceDir, cachedIconFile.getParentFile().getName())
                         if (!projectTypedDrawableDir.isDirectory()) {
                             projectTypedDrawableDir.mkdir()

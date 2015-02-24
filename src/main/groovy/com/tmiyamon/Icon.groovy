@@ -4,11 +4,9 @@ package com.tmiyamon
  */
 class Icon {
     static def DENSITIES = [
-            'drawable-mdpi',
-            'drawable-hdpi',
-            'drawable-xhdpi',
-            'drawable-xxhdpi',
-            'drawable-xxxhdpi' ]
+            'mdpi', 'hdpi', 'xhdpi', 'xxhdpi', 'xxxhdpi'
+    ].collect {"drawable-${it}"}
+
     static def CATEGORIES = [
             'action','alert','av','communication','content','device',
             'editor','file','hardware','image','maps','navigation',
@@ -43,7 +41,7 @@ class Icon {
     }
 
     static def eachCacheCanonicalIconsMatchedToGroups(File cacheDir, List<IconGroup> iconGroups, Closure closure)  {
-        def pattern = iconGroups.collect { it.canonicalPattern }.join("|")
+        def pattern = iconGroups*.canonicalPattern.join("|")
         eachCacheCanonicalIcons(cacheDir) { Icon icon ->
             if (icon.fileName =~ pattern) {
                 closure(icon)
@@ -130,8 +128,17 @@ class Icon {
     def generateCache(File cacheDir) {
         def canonicalColorIcon = newWithColor(CANONICAL_COLOR)
         def colorHex = MaterialColor.instance.getHexFrom(color)
-        def cmd = "/usr/local/bin/convert ${canonicalColorIcon.getCacheFile(cacheDir)} -fuzz 75% -fill ${colorHex} -opaque white -type TruecolorMatte PNG32:${getCacheFile(cacheDir)}"
-        cmd.execute().waitFor()
+
+        def src = canonicalColorIcon.getCacheFile(cacheDir).absolutePath
+        def dst = "PNG32:${getCacheFile(cacheDir).absolutePath}"
+
+        new ImageMagick()
+            .option("-fuzz", "75%")
+            .option('-fill', colorHex)
+            .option('-opaque', Icon.CANONICAL_COLOR)
+            .option('-type', 'TrueColorMatte')
+            .args(src, dst)
+            .exec()
     }
 
 
