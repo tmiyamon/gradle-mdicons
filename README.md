@@ -55,3 +55,23 @@ The regex `pattern` matches the file name of icons, but does not match the icon 
 Google's [material design icons repository](https://github.com/google/material-design-icons) follows a naming convention of `${iconname}_${color}_${size}`. Where the `color` is `black`, `white` or `grey600` and the `size` is `18dp`, `24dp`, `36dp` or `48dp`.
 
 The icon(s) matching the regex pattern will be copied for all screen densities present in the [material design icons repository](https://github.com/google/material-design-icons) (hdpi, mdpi, xhdpi, xxhdpi and xxxhdpi).
+
+## Experimantal
+
+The following features are now experimantal.
+
+### Group
+
+The `group` feature to support converting icons tinted using ImageMagick is ecperimantally added.
+
+#### Configuration
+
+The `name` which is regex pattern matches the file name of icons, `color` which is one of the names for material design's color defined in [colors.json](/src/main/resources/com/tmiyamon/colors.json) and `size` which is `18dp`, `24dp`, `36dp` or `48dp` are required for the `group`.
+
+If the Google's material design icons repository does not contain the specified color icon officially, mdicons try to convert from white icon to the color icon using ImageMagick.
+
+```groovy
+mdicons {
+    group name: "user|camera", color: 'red', size: '18dp'
+}
+```
