@@ -39,9 +39,9 @@ class ImageMagick {
         if (isAvailable()) {
             def cmd = [
                 this.bin,
-                this.options.collect { it.join(' ') }.join(' '),
-                this.args.join(' ')
-            ].join(' ')
+                this.options,
+                this.args
+            ].flatten().join(' ')
             cmd.execute().waitFor()
         }
     }
