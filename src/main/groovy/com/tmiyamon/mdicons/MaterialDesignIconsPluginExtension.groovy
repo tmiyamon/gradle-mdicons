@@ -1,4 +1,4 @@
-package com.tmiyamon
+package com.tmiyamon.mdicons
 
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper

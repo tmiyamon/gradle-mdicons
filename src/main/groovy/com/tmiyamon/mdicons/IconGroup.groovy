@@ -1,11 +1,8 @@
-package com.tmiyamon
-
-import groovy.json.JsonSlurper
-
+package com.tmiyamon.mdicons
 /**
  * Created by tmiyamon on 2/11/15.
  */
-class IconGroup {
+public class IconGroup {
     String name
     String color
     String size

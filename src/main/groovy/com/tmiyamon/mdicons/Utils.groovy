@@ -1,4 +1,4 @@
-package com.tmiyamon
+package com.tmiyamon.mdicons
 
 /**
  * Created by tmiyamon on 12/25/14.
@@ -37,5 +37,18 @@ class Utils {
     }
     static boolean isNotEmpty(Collection col) {
         return !isEmpty(col)
+    }
+
+
+    static def eachIconFiles(File root, Set iconTypes, String pattern, Closure closure) {
+        root.eachDirMatch({ iconTypes.contains(it.name) }) {
+            it.eachDirMatch({ it.name.startsWith("drawable")}) {
+                if (isNotEmpty(pattern)) {
+                    it.eachFileMatch({ it.name =~ pattern }, closure)
+                } else {
+                    it.eachFile(closure)
+                }
+            }
+        }
     }
 }

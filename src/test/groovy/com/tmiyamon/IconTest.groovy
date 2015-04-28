@@ -1,5 +1,6 @@
 package com.tmiyamon
 
+import com.tmiyamon.mdicons.Icon
 import org.junit.Before
 import org.junit.Test
 

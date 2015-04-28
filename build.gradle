@@ -4,7 +4,7 @@ plugins {
   id 'nu.studer.plugindev' version '1.0.3'
 }
 
-sourceCompatibility = 1.5
+sourceCompatibility = 1.6
 version = '0.2.3'
 group ='com.tmiyamon'
 
@@ -16,12 +16,12 @@ repositories {
 dependencies {
     compile gradleApi()
     compile localGroovy()
-    compile 'com.android.tools.build:gradle:1.0.0'
+    compile 'com.android.tools.build:gradle:1.1.3'
 }
 
 plugindev {
     pluginId 'com.tmiyamon.mdicons'
-    pluginImplementationClass 'com.tmiyamon.MaterialDesignIconsPlugin'
+    pluginImplementationClass 'com.tmiyamon.mdicons.MaterialDesignIconsPlugin'
     pluginDescription 'Gradle plugin for Android to manage official material design icons.'
     pluginLicenses 'Apache-2.0'
     pluginTags 'gradle', 'plugin', 'android'

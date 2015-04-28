@@ -1,8 +1,7 @@
 package com.tmiyamon
 
+import com.tmiyamon.mdicons.Utils
 import org.junit.Test
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matcher.*;
 
 /**
  * Created by tmiyamon on 12/26/14.

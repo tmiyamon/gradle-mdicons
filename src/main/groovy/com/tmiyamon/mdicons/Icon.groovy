@@ -1,4 +1,4 @@
-package com.tmiyamon
+package com.tmiyamon.mdicons
 /**
  * Created by tmiyamon on 2/11/15.
  */
