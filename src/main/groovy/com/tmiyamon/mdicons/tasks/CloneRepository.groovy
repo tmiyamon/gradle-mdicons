@@ -18,7 +18,6 @@ public class CloneRepository extends AbstractTaskWrapper {
     def doOnAfterEvaluate(Evaluator evaluator) {
         this.task.outputs.dir evaluator.cacheDir
         this.task.doLast {
-            println 'A message which is logged at INFO level'
             repository.cloneTo evaluator.cacheDir
         }
     }

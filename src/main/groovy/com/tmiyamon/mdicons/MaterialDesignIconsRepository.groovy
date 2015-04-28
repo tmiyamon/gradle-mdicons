@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory
  * Created by tmiyamon on 4/26/15.
  */
 class MaterialDesignIconsRepository {
-    private static final Logger logger = LoggerFactory.getLogger(MaterialDesignIconsRepository.getSimpleName())
+    private static final Logger logger = LoggerFactory.getLogger(MaterialDesignIconsRepository.canonicalName)
     public static final String URL = 'git@github.com:google/material-design-icons.git'
 
     def cloneTo(File dst) {
@@ -17,7 +17,6 @@ class MaterialDesignIconsRepository {
         p.consumeProcessOutput(sout, serr)
 
         def ret = p.waitFor()
-        logger.debug(sout.toString())
         if (ret != 0) {
             logger.warn(serr.toString())
         }

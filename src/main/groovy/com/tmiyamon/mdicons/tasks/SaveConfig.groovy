@@ -12,6 +12,6 @@ public class SaveConfig extends AbstractTaskWrapper {
     }
 
     def doOnAfterEvaluate(Evaluator evaluator) {
-//        project.mdicons.save(project)
+        this.task.project.mdicons.save(task.project)
     }
 }

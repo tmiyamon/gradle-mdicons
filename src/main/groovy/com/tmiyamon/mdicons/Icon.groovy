@@ -52,10 +52,13 @@ class Icon {
 
     static def eachProjectResourceIcons(File projectResourceDir, Closure closure) {
         DENSITIES.each {
-            new File(projectResourceDir, it).eachFile {
-                Icon icon = Icon.fromProjectResource(it)
-                if (icon != null) {
-                    closure(icon)
+            def iconDirInDensity = new File(projectResourceDir, it)
+            if (iconDirInDensity.isDirectory()) {
+                iconDirInDensity.eachFile {
+                    Icon icon = Icon.fromProjectResource(it)
+                    if (icon != null) {
+                        closure(icon)
+                    }
                 }
             }
         }
