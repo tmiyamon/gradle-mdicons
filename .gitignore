@@ -7,3 +7,4 @@ build/
 gradle/
 gradle.properties
 .java-version
+*.hprof

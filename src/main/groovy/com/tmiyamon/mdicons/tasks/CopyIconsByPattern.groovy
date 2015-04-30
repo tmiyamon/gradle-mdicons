@@ -1,7 +1,7 @@
 package com.tmiyamon.mdicons.tasks
 
 import com.tmiyamon.mdicons.Evaluator
-import com.tmiyamon.mdicons.Icon
+import com.tmiyamon.mdicons.MaterialDesignIconsRepository
 import com.tmiyamon.mdicons.Utils
 import org.gradle.api.Project
 
@@ -14,26 +14,32 @@ public class CopyIconsByPattern extends AbstractTaskWrapper {
     }
 
     def doOnAfterEvaluate(Evaluator evaluator) {
-        if (evaluator.configChanged &&
-                evaluator.cacheDir.isDirectory() &&
-                Utils.isNotEmpty(evaluator.pattern)) {
-
-            this.task.doLast {
-
-                Utils.eachIconFiles(evaluator.cacheDir, Icon.CATEGORIES, evaluator.pattern) { cachedIconFile ->
-                    def projectTypedDrawableDir = new File(evaluator.resourceDir, cachedIconFile.parentFile.name)
-                    if (!projectTypedDrawableDir.isDirectory()) {
-                        projectTypedDrawableDir.mkdir()
-                    }
-
-                    if (!new File(projectTypedDrawableDir, cachedIconFile.name).exists()) {
-                        project.copy {
-                            from cachedIconFile
-                            into projectTypedDrawableDir
-                        }
-                    }
-                }
-            }
+//        task.inputs.property("pattern", evaluator.pattern)
+        task.outputs.dir()
+        task.doLast {
+            def repository = new MaterialDesignIconsRepository(evaluator.cacheDir)
+            repository.copyIconFileMatch(task.project, /.*${evaluator.pattern}.*/)
         }
+//        if (evaluator.configChanged &&
+//                evaluator.cacheDir.isDirectory() &&
+//                Utils.isNotEmpty(evaluator.pattern)) {
+//
+//            this.task.doLast {
+//
+//                Utils.eachIconFiles(evaluator.cacheDir, Icon.CATEGORIES, evaluator.pattern) { cachedIconFile ->
+//                    def projectTypedDrawableDir = new File(evaluator.resourceDir, cachedIconFile.parentFile.name)
+//                    if (!projectTypedDrawableDir.isDirectory()) {
+//                        projectTypedDrawableDir.mkdir()
+//                    }
+//
+//                    if (!new File(projectTypedDrawableDir, cachedIconFile.name).exists()) {
+//                        project.copy {
+//                            from cachedIconFile
+//                            into projectTypedDrawableDir
+//                        }
+//                    }
+//                }
+//            }
+//        }
     }
 }

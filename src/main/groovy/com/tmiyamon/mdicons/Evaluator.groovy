@@ -12,6 +12,7 @@ class Evaluator {
     boolean configChanged
     String pattern
     List<Map<String, String>> groups
+    def copiedFilePaths
 
     public Evaluator(Project project) {
         MaterialDesignIconsPluginExtension ext = project.mdicons
@@ -20,5 +21,7 @@ class Evaluator {
         configChanged = ext.isChanged(project)
         pattern = ext.buildPattern()
         groups = ext.groups
+        //TODO
+        copiedFilePaths = []
     }
 }
