@@ -1,16 +1,24 @@
 package com.tmiyamon.mdicons.task
 
-import com.tmiyamon.mdicons.Evaluator
+import com.tmiyamon.mdicons.Extension
+import com.tmiyamon.mdicons.MaterialDesignIconsPlugin
+import com.tmiyamon.mdicons.ext.getExtensionOf
 import com.tmiyamon.mdicons.repository.MaterialDesignIcons
+import org.gradle.api.DefaultTask
 import org.gradle.api.Task
+import java.io.File
 
-class CloneRepository(val task: Task) : TaskLike {
-    override fun doOnAfterEvaluate(evaluator: Evaluator) {
-        val repository = MaterialDesignIcons(evaluator.cacheDir)
+open class CloneRepository() : DefaultTask() {
+    init {
+        val project = getProject()
+        val cacheDir = File(Extension.CACHE_PATH)
+        val repository = MaterialDesignIcons(cacheDir)
 
-        task.getOutputs().dir(evaluator.cacheDir)
-        task.doLast {
-            repository.gitClone()
+        project.afterEvaluate {
+            getOutputs().dir(cacheDir)
+            doLast {
+                repository.gitClone()
+            }
         }
     }
 }

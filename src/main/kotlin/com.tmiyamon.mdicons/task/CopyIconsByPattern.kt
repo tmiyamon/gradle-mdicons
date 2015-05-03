@@ -1,32 +1,33 @@
 package com.tmiyamon.mdicons.task
 
-import com.tmiyamon.mdicons.Evaluator
 import com.tmiyamon.mdicons.Extension
 import com.tmiyamon.mdicons.Result
 import com.tmiyamon.mdicons.ext.getExtensionOf
+import com.tmiyamon.mdicons.ext.slice
 import com.tmiyamon.mdicons.repository.MaterialDesignIcons
+import org.gradle.api.DefaultTask
 import org.gradle.api.Task
 import java.io.File
 import java.io.FileFilter
 import java.util.regex.Pattern
 
-class CopyIconsByPattern(val task: Task) : TaskLike {
-    override fun doOnAfterEvaluate(evaluator: Evaluator) {
-        task.doLast {
-            val ext = getExtensionOf(task.getProject())
-            val repository = MaterialDesignIcons(File(Extension.CACHE_PATH))
+open class CopyIconsByPattern() : DefaultTask() {
+    init {
+        val project = getProject()
+        val repository = MaterialDesignIcons(File(Extension.CACHE_PATH))
 
-            val results = repository.copyIconFileMatch(
-                    task.getProject(),
-                    FileFilter { it.name.matches(ext.buildPattern()) })
+        project.afterEvaluate {
+            val ext = getExtensionOf(project)
 
+            getInputs().properties(ext.toMap(Extension.KEY_PATTERNS))
+            getOutputs().upToDateWhen{ true }
+            doLast {
+                val results = repository.copyIconFileMatch(project, FileFilter { it.name.matches(ext.buildPattern()) })
 
-            ext.results.addAll(results.map {
-                Result(
-                    it.getSourceRelativePath(),
-                    it.getDestinationRelativePath(),
-                    task.getName())
-            })
+                ext.results.addAll(results.map {
+                    Result( it.getSourceRelativePath(), it.getDestinationRelativePath(), getName())
+                })
+            }
         }
     }
 }

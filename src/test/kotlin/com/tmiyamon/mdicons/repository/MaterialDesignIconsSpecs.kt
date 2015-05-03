@@ -20,11 +20,21 @@ class MaterialDesignIconsSpecs: Spek() { init {
                         )
             }
         }
+
         on(".parseFileName") {
             it("parses file name into name, color, size and ext") {
                 assertEquals(
                         MaterialDesignIcons.parseFileName(filename),
                         listOf("ic_camera", "white", "16dp", "png")
+                )
+            }
+        }
+
+        on(".buildFileName") {
+            it("builds file name with name, color, size and ext") {
+                assertEquals(
+                        MaterialDesignIcons.buildFileName("a","b","c","d"),
+                        "a_b_c.d"
                 )
             }
         }
@@ -78,6 +88,7 @@ class MaterialDesignIconsSpecs: Spek() { init {
                 assertEquals(icon.getSourceRelativePath(), pathJoin("a", "drawable-b", filename))
             }
         }
+
         on("#getDestinationRelativePath") {
             it("returns destination relative path") {
                 assertEquals(icon.getDestinationRelativePath(), pathJoin(Extension.PROJECT_RESOURCE_RELATIVE_PATH, "drawable-b", filename))
@@ -89,6 +100,36 @@ class MaterialDesignIconsSpecs: Spek() { init {
                 assertEquals(icon.toFile(), File(repository.rootDir, pathJoin("a", "drawable-b", filename)))
             }
         }
+
+        on("#isBaseIcon") {
+            it("return true if its color and density match to the base ones") {
+                val baseIcon = repository.newIcon(
+                        "a",
+                        MaterialDesignIcons.BASE_DENSITY,
+                        MaterialDesignIcons.buildFileName("b", MaterialDesignIcons.BASE_COLOR, "c", "d")
+                )
+                assertEquals(true, baseIcon.isBaseIcon())
+            }
+
+            it("returns false if its density is not base one") {
+                val notBaseIcon = repository.newIcon(
+                        "a",
+                        "notBaseDensity",
+                        MaterialDesignIcons.buildFileName("b", MaterialDesignIcons.BASE_COLOR, "c", "d")
+                )
+                assertEquals(false, notBaseIcon.isBaseIcon())
+            }
+
+            it("returns false if its color is not base one") {
+                val notBaseIcon = repository.newIcon(
+                        "a",
+                        MaterialDesignIcons.BASE_DENSITY,
+                        MaterialDesignIcons.buildFileName("b", "notBaseColor", "c", "d")
+                )
+                assertEquals(false, notBaseIcon.isBaseIcon())
+            }
+        }
+
         on("#newIconVariantsForDensitires") {
             it("returns icon variants for densities") {
                 assertEquals(

@@ -13,6 +13,11 @@ open class Extension {
         val PROJECT_RESOURCE_RELATIVE_PATH = pathJoin("src", "main", "res")
         val CACHE_PATH = pathJoin(System.getProperty("user.home"), ".material_design_icons")
 
+        val KEY_PATTERNS = "patterns"
+        val KEY_ASSETS = "assets"
+        val KEY_RESULTS = "results"
+        val SUPPORTED_KEYS_FOR_MAPPING = array(KEY_PATTERNS, KEY_RESULTS)
+
         fun loadPreviousConfig(project: Project): Extension {
             val prevConfig = project.file(FILENAME)
             return if (prevConfig.exists()) {
@@ -26,15 +31,20 @@ open class Extension {
     }
 
     val patterns = arrayListOf<String>()
-    val groups = arrayListOf<String>()
+//    val assets = arrayListOf<Asset>()
     val results = arrayListOf<Result>()
 
-    fun toMap(): Map<String, Any> {
-        return mapOf(
-            "patterns" to patterns,
-            "groups" to groups,
-            "results" to results
-        )
+    fun toMap(
+        vararg keys: String = SUPPORTED_KEYS_FOR_MAPPING
+    ): Map<String, Any> {
+        return keys.filter{ SUPPORTED_KEYS_FOR_MAPPING.contains(it) }.toMapWith { key ->
+            when(key) {
+                KEY_PATTERNS -> patterns
+//                KEY_ASSETS -> assets
+                KEY_RESULTS -> results
+                else -> {}
+            }
+        }
     }
 
     fun toJson(): String {
@@ -47,27 +57,28 @@ open class Extension {
         }
     }
 
-    fun isChanged(project: Project): Boolean {
-        val prevConfig = project.file(FILENAME)
-        if (prevConfig.exists()) {
-            try {
-                return toMap() != JsonSlurper().parse(prevConfig)
-            } catch (e: Exception) {
-                project.getLogger().warn("Ignore previous mdicons configuration due to its corruption")
-                return true
-            }
-        }
-        return true
-    }
-
     fun pattern(p: String): Unit {
         if (p.isNotEmpty()) {
             patterns.add(p)
         }
     }
 
+//    fun asset(fileNamePattern: String, color: List<String>, size: List<String>) {
+//        assets.add(Asset(fileNamePattern, color, size))
+//    }
+//    fun asset(fileNamePattern: String, color: String, size: List<String>) {
+//        asset(fileNamePattern, listOf(color), size)
+//    }
+//    fun asset(fileNamePattern: String, color: List<String>, size: String) {
+//        asset(fileNamePattern, color, listOf(size))
+//    }
+//    fun asset(fileNamePattern: String, color: String, size: String) {
+//        asset(fileNamePattern, listOf(color), listOf(size))
+//    }
+
     fun buildPattern(): String {
         return ".*(${patterns.join("|")}).*"
     }
+
 }
 

@@ -27,7 +27,9 @@ class MaterialDesignIcons(val rootDir: File) {
         val DENSITY_DIR_NAME_PREFIX = "drawable-"
 
         val ALL_FILE_FILTER = FileFilter { true }
+        val BASE_COLOR_FILE_FILITER = FileFilter { BASE_COLOR_FILE_NAME_PATTERN.matcher(it.name).matches() }
         val FILE_NAME_PATTERN = Pattern.compile("""(.+)_([^_]+)_([^_]+)\.(.+)""")
+        val BASE_COLOR_FILE_NAME_PATTERN = Pattern.compile(".*white.*")
 
         fun convertToDensityDirNameFrom(density: String): String {
             return "${DENSITY_DIR_NAME_PREFIX}${density}"
@@ -36,7 +38,9 @@ class MaterialDesignIcons(val rootDir: File) {
         fun parseFileName(fileName: String): List<String> {
             return FILE_NAME_PATTERN.matchGroups(fileName)
         }
-
+        fun buildFileName(name: String, color: String, size: String, ext: String): String{
+            return "${name}_${color}_${size}.${ext}"
+        }
     }
 
     fun gitClone(): Int {
@@ -79,6 +83,25 @@ class MaterialDesignIcons(val rootDir: File) {
         }
     }
 
+    fun eachBaseIcon(
+            categories: Array<String> = CATEGORIES,
+            filter: FileFilter = ALL_FILE_FILTER,
+            block: (Icon) -> Unit) {
+
+        val filterWithBaseColor = composeFileFilter(filter, BASE_COLOR_FILE_FILITER)
+        val density = BASE_DENSITY
+
+        categories.flatMap { category ->
+            val densityDirName =  convertToDensityDirNameFrom(density)
+            val dir = File(rootDir, pathJoin(category, densityDirName))
+
+            dir.listFiles(filterWithBaseColor).map { file ->
+               newIcon(category, density, file.name)
+            }
+        }.forEach { block(it) }
+    }
+
+
     fun iconMatchGroupByDensity(filter: FileFilter): Map<String, List<Icon>> {
         val results: MutableMap<String, MutableList<Icon>> = linkedMapOf()
 
@@ -90,7 +113,6 @@ class MaterialDesignIcons(val rootDir: File) {
     }
 
     fun copyIconFileMatch(project: Project, filter: FileFilter): List<Icon> {
-        val ext = getExtensionOf(project)
         val results = arrayListOf<Icon>()
 
         for ( (density, icons) in iconMatchGroupByDensity(filter)) {
@@ -111,6 +133,12 @@ class MaterialDesignIcons(val rootDir: File) {
                 }
             }
         }
+
+        return results
+    }
+
+    fun copyIconFileMatchGroup(project:Project, filter: FileFilter): List<Icon> {
+        val results = arrayListOf<Icon>()
 
         return results
     }
@@ -136,7 +164,7 @@ class MaterialDesignIcons(val rootDir: File) {
             val ext: String) {
 
         fun getFileName(): String {
-            return "${name}_${color}_${size}.${ext}"
+            return buildFileName(name, color, size, ext)
         }
 
         fun getSourceRelativePath(): String {
@@ -157,8 +185,12 @@ class MaterialDesignIcons(val rootDir: File) {
             }
         }
 
+        fun isBaseIcon(): Boolean {
+            return density == BASE_DENSITY && color == BASE_COLOR
+        }
+
         fun assertBaseIcon() {
-            if(density != BASE_DENSITY || color != BASE_COLOR) {
+            if(!isBaseIcon()) {
                 throw Exception("only allowed in base icon")
             }
         }

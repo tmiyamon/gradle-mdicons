@@ -3,7 +3,7 @@ package com.tmiyamon.mdicons
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
 import com.tmiyamon.mdicons
-import com.tmiyamon.mdicons.Evaluator
+import com.tmiyamon.mdicons.ext.taskOf
 import com.tmiyamon.mdicons.task.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -19,24 +19,17 @@ public class MaterialDesignIconsPlugin: Plugin<Project> {
     override fun apply(p: Project) {
         p.getExtensions().create(NAME, javaClass<Extension>())
 
-        val cloneRepository    = CloneRepository(p.task("${NAME}CloneRepository"))
-        val cleanIcons         = CleanIcons(p.task("${NAME}CleanIcons"))
-        val copyIconsByPattern = CopyIconsByPattern(p.task("${NAME}CopyIconsByPattern").dependsOn(cloneRepository.task, cleanIcons.task))
-        val copyIconsByGroup   = CopyIconsByGroup(p.task("${NAME}CopyIconsByGroups").dependsOn(cloneRepository.task, cleanIcons.task))
-        val saveConfig         = SaveConfig(p.task("${NAME}SaveConfig").dependsOn(copyIconsByPattern.task, copyIconsByGroup.task, cleanIcons.task, cloneRepository.task))
-
-        val tasks = arrayListOf(cloneRepository, cleanIcons, copyIconsByPattern, copyIconsByGroup, saveConfig)
+        val cloneRepository    = p.taskOf(javaClass<CloneRepository>())
+        val cleanIcons         = p.taskOf(javaClass<CleanIcons>())
+        val copyIconsByPattern = p.taskOf(javaClass<CopyIconsByPattern>()).dependsOn(cloneRepository, cleanIcons)
+        val copyIconsByGroup   = p.taskOf(javaClass<CopyIconsByGroup>()).dependsOn(cloneRepository, cleanIcons)
+        val saveConfig         = p.taskOf(javaClass<SaveConfig>()).dependsOn(copyIconsByPattern, copyIconsByGroup, cleanIcons, cloneRepository)
 
         p.getPlugins().withType(javaClass<AppPlugin>()) {
-            p.getTasks().findByName("preBuild").dependsOn(saveConfig.task)
+            p.getTasks().findByName("preBuild").dependsOn(saveConfig)
         }
         p.getPlugins().withType(javaClass<LibraryPlugin>()) {
-            p.getTasks().findByName("preBuild").dependsOn(saveConfig.task)
-        }
-
-        p.afterEvaluate {
-            val evaluator = Evaluator(p)
-            tasks.forEach { it.doOnAfterEvaluate(evaluator) }
+            p.getTasks().findByName("preBuild").dependsOn(saveConfig)
         }
     }
 }
