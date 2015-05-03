@@ -20,23 +20,22 @@ open class CopyIconsByPattern() : DefaultTask() {
         project.afterEvaluate {
             val ext = getExtensionOf(project)
 
+            onlyIf{ ext.patterns.isNotEmpty() }
             getInputs().properties(ext.toMap(Extension.KEY_PATTERNS))
             getOutputs().upToDateWhen{ true }
 
             doLast {
-                if(ext.patterns.isNotEmpty()) {
-                    val pattern = ext.buildPattern()
+                val pattern = ext.buildPattern()
 
-                    MaterialDesignIconsPlugin.logger.info("[${getName()}] pattern: $pattern")
+                MaterialDesignIconsPlugin.logger.info("[${getName()}] pattern: $pattern")
 
-                    val results = repository.copyIconFileMatch(project, FileFilter {
-                        it.name.matches(pattern)
-                    })
+                val results = repository.copyIconFileMatch(project, FileFilter {
+                    it.name.matches(pattern)
+                })
 
-                    ext.results.addAll(results.map {
-                        Result(it.getSourceRelativePath(), it.getDestinationRelativePath(), getName())
-                    })
-                }
+                ext.results.addAll(results.map {
+                    Result(it.getSourceRelativePath(), it.getDestinationRelativePath(), getName())
+                })
             }
         }
     }

@@ -15,7 +15,7 @@ open class CloneRepository() : DefaultTask() {
         val repository = MaterialDesignIcons(cacheDir)
 
         project.afterEvaluate {
-            getOutputs().dir(cacheDir)
+            onlyIf{ !cacheDir.isDirectory() }
             doLast {
                 repository.gitClone()
             }
