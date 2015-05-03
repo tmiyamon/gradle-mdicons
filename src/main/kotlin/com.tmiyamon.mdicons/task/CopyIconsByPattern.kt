@@ -1,6 +1,7 @@
 package com.tmiyamon.mdicons.task
 
 import com.tmiyamon.mdicons.Extension
+import com.tmiyamon.mdicons.MaterialDesignIconsPlugin
 import com.tmiyamon.mdicons.Result
 import com.tmiyamon.mdicons.ext.getExtensionOf
 import com.tmiyamon.mdicons.ext.slice
@@ -21,12 +22,21 @@ open class CopyIconsByPattern() : DefaultTask() {
 
             getInputs().properties(ext.toMap(Extension.KEY_PATTERNS))
             getOutputs().upToDateWhen{ true }
-            doLast {
-                val results = repository.copyIconFileMatch(project, FileFilter { it.name.matches(ext.buildPattern()) })
 
-                ext.results.addAll(results.map {
-                    Result( it.getSourceRelativePath(), it.getDestinationRelativePath(), getName())
-                })
+            doLast {
+                if(ext.patterns.isNotEmpty()) {
+                    val pattern = ext.buildPattern()
+
+                    MaterialDesignIconsPlugin.logger.info("[${getName()}] pattern: $pattern")
+
+                    val results = repository.copyIconFileMatch(project, FileFilter {
+                        it.name.matches(pattern)
+                    })
+
+                    ext.results.addAll(results.map {
+                        Result(it.getSourceRelativePath(), it.getDestinationRelativePath(), getName())
+                    })
+                }
             }
         }
     }
