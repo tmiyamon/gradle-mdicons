@@ -27,3 +27,20 @@ fun composeFileFilter(vararg filters: FileFilter): FileFilter {
         filters.fold(true) { acc, f -> acc && f.accept(file) }
     }
 }
+
+fun trace(s: Any) {
+    MaterialDesignIconsPlugin.logger.trace(s.toString())
+}
+fun debug(s: Any) {
+    MaterialDesignIconsPlugin.logger.debug(s.toString())
+}
+fun info(s: Any) {
+    MaterialDesignIconsPlugin.logger.info(s.toString())
+}
+fun warn(s: Any) {
+    MaterialDesignIconsPlugin.logger.warn(s.toString())
+}
+fun error(s: Any) {
+    MaterialDesignIconsPlugin.logger.error(s.toString())
+}
+

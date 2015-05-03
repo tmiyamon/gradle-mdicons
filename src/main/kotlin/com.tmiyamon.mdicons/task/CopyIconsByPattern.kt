@@ -4,7 +4,9 @@ import com.tmiyamon.mdicons.Extension
 import com.tmiyamon.mdicons.MaterialDesignIconsPlugin
 import com.tmiyamon.mdicons.Result
 import com.tmiyamon.mdicons.ext.getExtensionOf
+import com.tmiyamon.mdicons.ext.info
 import com.tmiyamon.mdicons.ext.slice
+import com.tmiyamon.mdicons.ext.tap
 import com.tmiyamon.mdicons.repository.MaterialDesignIcons
 import org.gradle.api.DefaultTask
 import org.gradle.api.Task
@@ -26,8 +28,7 @@ open class CopyIconsByPattern() : DefaultTask() {
 
             doLast {
                 val pattern = ext.buildPattern()
-
-                MaterialDesignIconsPlugin.logger.info("[${getName()}] pattern: $pattern")
+                info("matching pattern: $pattern")
 
                 val results = repository.copyIconFileMatch(project, FileFilter {
                     it.name.matches(pattern)

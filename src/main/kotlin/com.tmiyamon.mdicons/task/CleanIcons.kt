@@ -3,6 +3,7 @@ package com.tmiyamon.mdicons.task
 import com.tmiyamon.mdicons.Extension
 import com.tmiyamon.mdicons.MaterialDesignIconsPlugin
 import com.tmiyamon.mdicons.ext.getExtensionOf
+import com.tmiyamon.mdicons.ext.info
 import com.tmiyamon.mdicons.ext.slice
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
@@ -22,7 +23,7 @@ open class CleanIcons() : DefaultTask() {
             doLast {
                 Extension.loadPreviousConfig(project).results.forEach {
                     if(project.file(it.dstPath).delete()) {
-                        MaterialDesignIconsPlugin.logger.info("Removed ${it.dstPath} (added in ${it.taskName})")
+                        info("Removed ${it.dstPath} (added in ${it.taskName})")
                     }
                 }
             }

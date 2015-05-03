@@ -117,7 +117,7 @@ class MaterialDesignIcons(val rootDir: File) {
 
         for ( (density, icons) in iconMatchGroupByDensity(filter)) {
 
-            MaterialDesignIconsPlugin.logger.debug("$density: $icons")
+            debug("$density: $icons")
 
             icons.forEach {
                 val srcFile = it.toFile()
@@ -127,6 +127,7 @@ class MaterialDesignIcons(val rootDir: File) {
 
                 try {
                     GFileUtils.copyFile(srcFile, dstFile)
+                    info("copy: ${it.getFileName()} ($srcFile -> $dstFile})")
                     results.add(it)
                 } catch (e: Exception) {
                     // TODO error handling
