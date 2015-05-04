@@ -28,19 +28,19 @@ fun composeFileFilter(vararg filters: FileFilter): FileFilter {
     }
 }
 
-fun trace(s: Any) {
-    MaterialDesignIconsPlugin.logger.trace(s.toString())
+fun trace(vararg s: Any) {
+    MaterialDesignIconsPlugin.logger.trace(s.map { it.toString() }.join(" "))
 }
-fun debug(s: Any) {
-    MaterialDesignIconsPlugin.logger.debug(s.toString())
+fun debug(vararg s: Any) {
+    MaterialDesignIconsPlugin.logger.debug(s.map { it.toString() }.join(" "))
 }
-fun info(s: Any) {
-    MaterialDesignIconsPlugin.logger.info(s.toString())
+fun info(vararg s: Any) {
+    MaterialDesignIconsPlugin.logger.info(s.map { it.toString() }.join(" "))
 }
-fun warn(s: Any) {
-    MaterialDesignIconsPlugin.logger.warn(s.toString())
+fun warn(vararg s: Any) {
+    MaterialDesignIconsPlugin.logger.warn(s.map { it.toString() }.join(" "))
 }
-fun error(s: Any) {
-    MaterialDesignIconsPlugin.logger.error(s.toString())
+fun error(vararg s: Any) {
+    MaterialDesignIconsPlugin.logger.error(s.map { it.toString() }.join(" "))
 }
 

@@ -22,7 +22,7 @@ public class MaterialDesignIconsPlugin: Plugin<Project> {
         val cloneRepository    = p.taskOf(javaClass<CloneRepository>())
         val cleanIcons         = p.taskOf(javaClass<CleanIcons>())
         val copyIconsByPattern = p.taskOf(javaClass<CopyIconsByPattern>()).dependsOn(cloneRepository, cleanIcons)
-        val copyIconsByGroup   = p.taskOf(javaClass<CopyIconsByGroup>()).dependsOn(cloneRepository, cleanIcons)
+        val copyIconsByGroup   = p.taskOf(javaClass<CopyIconsByAsset>()).dependsOn(cloneRepository, cleanIcons)
         val saveConfig         = p.taskOf(javaClass<SaveConfig>()).dependsOn(copyIconsByPattern, copyIconsByGroup, cleanIcons, cloneRepository)
 
         p.getPlugins().withType(javaClass<AppPlugin>()) {

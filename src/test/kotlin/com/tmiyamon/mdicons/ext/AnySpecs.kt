@@ -9,7 +9,7 @@ class AnySpecs: Spek() { init {
     given("Any") {
         on("#tap") {
             it("returns itself with calling block") {
-                assertEquals((AnySample("a").tap{ o -> (o as AnySample).a = "test" } as AnySample).a, "test")
+                assertEquals((AnySample("a").tap{ o -> (o).a = "test" }).a, "test")
             }
         }
     }

@@ -1,8 +1,8 @@
 package com.tmiyamon.mdicons.repository
 
-import com.tmiyamon.mdicons.Extension
-import com.tmiyamon.mdicons.MaterialDesignIconsPlugin
-import com.tmiyamon.mdicons.Result
+import com.tmiyamon.mdicons.*
+import com.tmiyamon.mdicons.cmd.Git
+import com.tmiyamon.mdicons.cmd.ImageMagick
 import java.io.File
 import com.tmiyamon.mdicons.ext.*
 import org.apache.commons.io.FileUtils
@@ -43,9 +43,11 @@ class MaterialDesignIcons(val rootDir: File) {
         }
     }
 
+    val git = Git()
+    val imageMagick = ImageMagick()
+
     fun gitClone(): Int {
-        val p = ProcessBuilder("git", "clone", URL, rootDir.getAbsolutePath())
-        return p.start().waitFor()
+        return git.clone().arg(URL, rootDir.getAbsolutePath()).exec()
     }
 
     fun eachIconDir(
@@ -112,25 +114,14 @@ class MaterialDesignIcons(val rootDir: File) {
         return results
     }
 
+
     fun copyIconFileMatch(project: Project, filter: FileFilter): List<Icon> {
         val results = arrayListOf<Icon>()
 
-        for ( (density, icons) in iconMatchGroupByDensity(filter)) {
-
-            debug("$density: $icons")
-
-            icons.forEach {
-                val srcFile = it.toFile()
-                val dstFile = project.file(it.getDestinationRelativePath())
-
-                dstFile.getParentFile().mkdirs()
-
-                try {
-                    GFileUtils.copyFile(srcFile, dstFile)
-                    info("copy: ${it.getFileName()} ($srcFile -> $dstFile})")
-                    results.add(it)
-                } catch (e: Exception) {
-                    // TODO error handling
+        for ((density, icons) in iconMatchGroupByDensity(filter)) {
+            icons.forEach { icon ->
+                if(icon.copyTo(project)) {
+                    results.add(icon)
                 }
             }
         }
@@ -138,8 +129,30 @@ class MaterialDesignIcons(val rootDir: File) {
         return results
     }
 
-    fun copyIconFileMatchGroup(project:Project, filter: FileFilter): List<Icon> {
+
+    fun copyIconFileMatchAsset(project:Project, assetData: List<Asset>): List<Icon> {
+        val assets = assetData.map { AssetWrapper(it) }
         val results = arrayListOf<Icon>()
+
+        val allAssetsPatternString = """(?:${assets.map { it.patternStringForBaseIcon }.join("|")})"""
+        val allAssetsPattern = Pattern.compile(allAssetsPatternString)
+        val allAssetsFileFilter = FileFilter { allAssetsPattern.matcher(it.name).find() }
+
+        eachBaseIcon(filter = allAssetsFileFilter ) { baseIcon ->
+            assets.forEach { asset ->
+                if (asset.pattern.matcher(baseIcon.getFileName()).find()) {
+                    asset.colors.forEach { newColor ->
+                        baseIcon.newIconVariantsForDensities()
+                            .forEach {
+                                val icon = it.newWithColorAndGenerateIfNeeded(newColor)
+                                if(icon.copyTo(project)) {
+                                    results.add(icon)
+                                }
+                            }
+                    }
+                }
+            }
+        }
 
         return results
     }
@@ -186,6 +199,24 @@ class MaterialDesignIcons(val rootDir: File) {
             }
         }
 
+        fun copyTo(project: Project): Boolean {
+            val srcFile = toFile()
+            val dstFile = project.file(getDestinationRelativePath())
+
+            dstFile.getParentFile().mkdirs()
+
+            try {
+                info("copy: ${getFileName()} ($srcFile -> $dstFile})")
+                GFileUtils.copyFile(srcFile, dstFile)
+
+                return true
+
+            } catch (e: Exception) {
+                warn("Failed to copy: ${getFileName()} caused by ${e}")
+                return false
+            }
+        }
+
         fun isBaseIcon(): Boolean {
             return density == BASE_DENSITY && color == BASE_COLOR
         }
@@ -197,22 +228,21 @@ class MaterialDesignIcons(val rootDir: File) {
         }
 
         fun newWithColorAndGenerateIfNeeded(newColor: String): Icon {
-            assertBaseIcon()
             val cloned = Icon(this.category, this.density, this.name, newColor, this.size, this.ext)
             val file = cloned.toFile()
             if (file.exists()) {
                 return cloned
             }
 
-//            val newColorHex = MaterialColor.instance.getHexFrom(newColor)
-//
-//            new ImageMagick()
-//                    .option("-fuzz", "75%")
-//                    .option('-fill', newColorHex)
-//                    .option('-opaque', this.color)
-//                    .option('-type', 'TrueColorMatte')
-//                    .args(this.toFile().absolutePath, "PNG32:${cloned.toFile().absolutePath}")
-//                    .exec()
+            val newColorHex = MaterialColor.getHexFrom(newColor)
+
+            imageMagick.convert()
+                .option("-fuzz", "75%")
+                .option("-fill", newColorHex)
+                .option("-opaque", this.color)
+                .option("-type", "TrueColorMatte")
+                .arg(this.toFile().getAbsolutePath(), "PNG32:${cloned.toFile().getAbsolutePath()}")
+                .exec()
 
             return cloned
         }
@@ -237,5 +267,16 @@ class MaterialDesignIcons(val rootDir: File) {
         override fun toString(): String {
             return "MaterialDesignIcons\$Icon(category=$category,density=$density,name=$name,color=$color,size=$size,ext=$ext)"
         }
+    }
+
+    class AssetWrapper(val asset: Asset) {
+        val names = asset.names
+        val colors = asset.colors
+        val sizes = asset.sizes
+
+        val patternString = """(?:${names.join("|")})_(?:${colors.join("|")})_(?:${sizes.join("|")})"""
+        val patternStringForBaseIcon = """(?:${names.join("|")})_${BASE_COLOR}_(?:${sizes.join("|")})"""
+        val pattern = Pattern.compile(patternString)
+        val patternForBaseIcon = Pattern.compile(patternStringForBaseIcon)
     }
 }

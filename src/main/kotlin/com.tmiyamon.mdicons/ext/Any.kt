@@ -1,7 +1,8 @@
 package com.tmiyamon.mdicons.ext
 
-fun Any.tap(block: (Any) -> Unit): Any {
+fun <T> T.tap(block: (T) -> Unit): T {
     block(this)
     return this
 }
+
 

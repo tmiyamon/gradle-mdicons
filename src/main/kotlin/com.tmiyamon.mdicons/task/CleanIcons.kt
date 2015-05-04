@@ -23,7 +23,7 @@ open class CleanIcons() : DefaultTask() {
             doLast {
                 Extension.loadPreviousConfig(project).results.forEach {
                     if(project.file(it.dstPath).delete()) {
-                        info("Removed ${it.dstPath} (added in ${it.taskName})")
+                        info("Removed ${it.dstPath} (added in last ${it.taskName})")
                     }
                 }
             }
