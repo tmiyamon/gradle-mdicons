@@ -60,18 +60,23 @@ The icon(s) matching the regex pattern will be copied for all screen densities p
 
 The following features are now experimental.
 
-### Group
+### Asset
 
-The `group` feature to support converting icons tinted using ImageMagick is experimentally added.
+The `asset` feature to support converting icons tinted using ImageMagick is experimentally added.
+
+#### Required
+
+ImageMagick
 
 #### Configuration
 
-The `name` which is regex pattern matches the file name of icons, `color` which is one of the names for material design's color defined in [colors.json](/src/main/resources/com/tmiyamon/colors.json) and `size` which is `18dp`, `24dp`, `36dp` or `48dp` are required for the `group`.
+The `name` which is regex pattern matches the file name of icons, `color` which is one of the names for material design's color defined in [colors.json](/src/main/resources/com/tmiyamon/colors.json) and `size` are required for the `asset`.
 
 If the Google's material design icons repository does not contain the specified color icon officially, the plugin will try to convert from white icon to the color icon using ImageMagick.
 
 ```groovy
 mdicons {
-    group name: "user|camera", color: 'red', size: '18dp'
+    asset name: "user", color: "red", size: "18dp"
+    asset name: ["camera.*", "search"], color: ["pink100", "black"], size: ["18dp", "24dp"]
 }
 ```

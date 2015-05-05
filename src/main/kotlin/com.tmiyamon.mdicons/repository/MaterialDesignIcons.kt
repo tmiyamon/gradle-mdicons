@@ -137,18 +137,29 @@ class MaterialDesignIcons(val rootDir: File) {
         val allAssetsPatternString = """(?:${assets.map { it.patternStringForBaseIcon }.join("|")})"""
         val allAssetsPattern = Pattern.compile(allAssetsPatternString)
         val allAssetsFileFilter = FileFilter { allAssetsPattern.matcher(it.name).find() }
+        info("searching base icons matched to asset pattern:", allAssetsPatternString)
 
         eachBaseIcon(filter = allAssetsFileFilter ) { baseIcon ->
+            debug("matched: $baseIcon")
+
             assets.forEach { asset ->
-                if (asset.pattern.matcher(baseIcon.getFileName()).find()) {
+                debug("checking:", asset.patternForBaseIcon, "matches", baseIcon)
+
+                if (asset.patternForBaseIcon.matcher(baseIcon.getFileName()).find()) {
+                    info(asset.patternString, "matches", baseIcon)
+
                     asset.colors.forEach { newColor ->
-                        baseIcon.newIconVariantsForDensities()
-                            .forEach {
+                        baseIcon.newIconVariantsForDensities().forEach {
+                            try {
                                 val icon = it.newWithColorAndGenerateIfNeeded(newColor)
-                                if(icon.copyTo(project)) {
+                                if (icon.copyTo(project)) {
                                     results.add(icon)
                                 }
+
+                            } catch (e: Exception) {
+                                warn("could not generate $newColor icon from $baseIcon caused by $e")
                             }
+                        }
                     }
                 }
             }
