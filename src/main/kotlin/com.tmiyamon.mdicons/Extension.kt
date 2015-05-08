@@ -20,12 +20,16 @@ open class Extension() {
 
         fun loadPreviousConfig(project: Project): Extension {
             val prevConfig = project.file(FILENAME)
-            return if (prevConfig.exists()) {
-                prevConfig.withReader {
-                    Gson().fromJson(it, javaClass<Extension>())
+            try {
+                return if (prevConfig.exists()) {
+                    prevConfig.withReader {
+                        Gson().fromJson(it, javaClass<Extension>())
+                    }
+                } else {
+                    Extension()
                 }
-            } else {
-                Extension()
+            } catch(e: Exception) {
+                return Extension()
             }
         }
     }
