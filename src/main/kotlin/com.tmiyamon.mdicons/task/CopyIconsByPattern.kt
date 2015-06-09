@@ -30,7 +30,7 @@ open class CopyIconsByPattern() : DefaultTask() {
                 val pattern = ext.buildPattern().tap { info("matching pattern: $it") }
 
                 val results = repository.copyIconFileMatch(project, FileFilter {
-                    it.name.matches(pattern)
+                    it.name.matches(pattern.toRegex())
                 })
 
                 ext.results.addAll(results.map {

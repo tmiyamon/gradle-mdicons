@@ -8,7 +8,7 @@ class FileSpecs : Spek() { init {
     given("File") {
         on(".pathJoin") {
             it("returns path with path fragments") {
-                val paths = array("a", "b", "c")
+                val paths = arrayOf("a", "b", "c")
                 assertEquals(pathJoin(*paths), "a${File.separator}b${File.separator}c")
             }
         }

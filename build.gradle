@@ -1,10 +1,11 @@
 buildscript {
-  repositories {
-    mavenCentral()
-  }
-  dependencies {
-    classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:+'
-  }
+    ext.kotlin_version = '0.12.213'
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
 }
 
 plugins {
@@ -21,18 +22,17 @@ group ='com.tmiyamon'
 repositories {
     jcenter()
     mavenCentral()
-     maven {
+    maven {
         url "http://repository.jetbrains.com/all"
     }
 }
 
-
 dependencies {
     compile gradleApi()
     compile localGroovy()
-    compile 'com.android.tools.build:gradle:1.1.3'
-    compile 'org.jetbrains.kotlin:kotlin-stdlib:0.11.91.2'
-    compile 'org.jetbrains.kotlin:kotlin-reflect:0.11.91.2'
+    compile 'com.android.tools.build:gradle:1.2.3'
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     testCompile 'org.jetbrains.spek:spek:0.1-SNAPSHOT'
 }
 

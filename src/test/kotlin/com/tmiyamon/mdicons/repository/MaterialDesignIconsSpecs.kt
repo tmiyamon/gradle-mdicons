@@ -42,8 +42,8 @@ class MaterialDesignIconsSpecs: Spek() { init {
         on("#eachIconDir") {
             it("traverses each icon directories with specific categories and densities") {
 
-                val categories = array("a","b")
-                val densities = array("c","d")
+                val categories = arrayOf("a", "b")
+                val densities = arrayOf("c", "d")
                 val expected = listOf(
                     listOf("a","c", File(repository.rootDir, pathJoin("a", "drawable-c"))),
                     listOf("a","d", File(repository.rootDir, pathJoin("a", "drawable-d"))),
@@ -133,7 +133,7 @@ class MaterialDesignIconsSpecs: Spek() { init {
         on("#newIconVariantsForDensitires") {
             it("returns icon variants for densities") {
                 assertEquals(
-                        icon.newIconVariantsForDensities(array("a","b")),
+                        icon.newIconVariantsForDensities(arrayOf("a", "b")),
                         listOf(
                                 repository.newIcon("a", "a", filename),
                                 repository.newIcon("a", "b", filename)

@@ -19,9 +19,9 @@ import java.util.regex.Pattern
 class MaterialDesignIcons(val rootDir: File) {
     companion object {
         val URL = "https://github.com/google/material-design-icons.git"
-        val DENSITIES = array("mdpi", "hdpi", "xhdpi", "xxhdpi", "xxxhdpi")
-        val CATEGORIES = array("action", "alert", "av", "communication", "content", "device", "editor", "file", "hardware", "image", "maps", "navigation", "notification", "social", "toggle")
-        val COLORS = array("white", "black", "grey600")
+        val DENSITIES = arrayOf("mdpi", "hdpi", "xhdpi", "xxhdpi", "xxxhdpi")
+        val CATEGORIES = arrayOf("action", "alert", "av", "communication", "content", "device", "editor", "file", "hardware", "image", "maps", "navigation", "notification", "social", "toggle")
+        val COLORS = arrayOf("white", "black", "grey600")
         val BASE_COLOR = "white"
         val BASE_DENSITY = DENSITIES[0]
         val DENSITY_DIR_NAME_PREFIX = "drawable-"
@@ -266,7 +266,7 @@ class MaterialDesignIcons(val rootDir: File) {
                 return false;
             }
 
-            val o = other: Icon
+            val o = other
             return o.category == this.category &&
                     o.color == this.color &&
                     o.density == this.density &&

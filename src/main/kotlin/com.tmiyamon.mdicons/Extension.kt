@@ -16,7 +16,7 @@ open class Extension() {
         val KEY_PATTERNS = "patterns"
         val KEY_ASSETS = "assets"
         val KEY_RESULTS = "results"
-        val SUPPORTED_KEYS_FOR_MAPPING = array(KEY_PATTERNS, KEY_ASSETS, KEY_RESULTS)
+        val SUPPORTED_KEYS_FOR_MAPPING = arrayOf(KEY_PATTERNS, KEY_ASSETS, KEY_RESULTS)
 
         fun loadPreviousConfig(project: Project): Extension {
             val prevConfig = project.file(FILENAME)
@@ -69,7 +69,7 @@ open class Extension() {
     }
 
     fun asset(map: Map<String, Any>) {
-        val keys = array("name", "color", "size")
+        val keys = arrayOf("name", "color", "size")
 
         if (map.keySet().intersect(setOf(*keys)).size() != keys.size()) {
             warn("Failed to apply parameters(${map}) to asset. All params of name, color and size must be given")
@@ -78,14 +78,14 @@ open class Extension() {
 
         val (names, colors, sizes) = map.valuesAt(*keys).map {
             when(it) {
-                is Array<*> -> it.map { it.toString() }.copyToArray()
-                is List<*> -> it.map { it.toString() }.copyToArray()
-                is String -> array(it)
+                is Array<*> -> it.map { it.toString() }.toTypedArray()
+                is List<*> -> it.map { it.toString() }.toTypedArray()
+                is String -> arrayOf(it)
                 else -> null
             }
         }
 
-        if (array(names, colors, sizes).any { it == null }) {
+        if (arrayOf(names, colors, sizes).any { it == null }) {
             warn("Failed to apply parameters(${map}) to asset. All values must be non-null String, Array or List")
             return
         }

@@ -9,8 +9,8 @@ fun exec(vararg strs: String): Int {
     return ProcessBuilder(*strs).start().waitFor()
 }
 
-trait Command {
-    fun searchPath() = array("/usr/bin", "/usr/local/bin")
+interface Command {
+    fun searchPath() = arrayOf("/usr/bin", "/usr/local/bin")
 
     fun findBin(binName: String): String {
         //TODO support windows
@@ -46,7 +46,7 @@ trait Command {
 
         fun exec(): Int {
             val commandFragments = (arrayListOf(bin, subCmd) + options.flatten() + args).filter { it.isNotEmpty() }
-            return exec(*commandFragments.copyToArray())
+            return exec(*commandFragments.toTypedArray())
         }
     }
 }
