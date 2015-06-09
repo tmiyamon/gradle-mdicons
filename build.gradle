@@ -16,7 +16,7 @@ plugins {
 apply plugin: "kotlin"
 
 sourceCompatibility = 1.6
-version = '0.2.6'
+version = '0.2.7'
 group ='com.tmiyamon'
 
 repositories {
