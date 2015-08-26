@@ -10,7 +10,7 @@ fun exec(vararg strs: String): Int {
 }
 
 interface Command {
-    fun searchPath() = arrayOf("/usr/bin", "/usr/local/bin")
+    fun searchPath() = arrayOf("/usr/bin", "/usr/local/bin", "/opt/local/bin")
 
     fun findBin(binName: String): String {
         //TODO support windows
