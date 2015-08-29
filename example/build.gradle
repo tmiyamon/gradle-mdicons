@@ -1,0 +1,24 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+    dependencies {
+        classpath 'com.tmiyamon:gradle-mdicons:0.2.7'
+    }
+}
+
+apply plugin: 'com.tmiyamon.mdicons'
+
+mdicons {
+    assets {
+        sidebar {
+            
+        }
+
+        toolbar {
+
+        }
+    }
+}
+
