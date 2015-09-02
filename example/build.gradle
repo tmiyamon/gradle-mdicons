@@ -13,11 +13,22 @@ apply plugin: 'com.tmiyamon.mdicons'
 mdicons {
     assets {
         sidebar {
-            
+            densities = ['mdpi', 'xhdpi']
+            colors = "white"
+            sizes = "18dp"
+            names = [
+                "ic_camera",
+                "ic_search"
+            ]
         }
 
         toolbar {
-
+            densities = ['mdpi', 'xhdpi']
+            colors = "white"
+            sizes = "18dp"
+            names = [
+                "ic_home"
+            ]
         }
     }
 }

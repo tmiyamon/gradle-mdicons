@@ -8,3 +8,4 @@ gradle/
 gradle.properties
 .java-version
 *.hprof
+example/src/main/res

@@ -5,6 +5,8 @@ import org.gradle.api.NamedDomainObjectContainer
 class MaterialDesignIconsExtension {
     final private NamedDomainObjectContainer<AssetTarget> userAssets
 
+    String iconDirPrefix = "mipmap"
+
     public MaterialDesignIconsExtension(NamedDomainObjectContainer<AssetTarget> assets) {
         this.userAssets = assets
     }
