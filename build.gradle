@@ -40,3 +40,11 @@ if (hasProperty('BINTRAY_API_KEY')) {
         pkg.repo = 'gradle-plugins'
     }
 }
+
+
+task debugExample << {
+    println subprojects
+//    subprojects.find {
+//        it.projectDir.name == 'example'
+//    }."$task"
+}

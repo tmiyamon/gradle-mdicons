@@ -19,7 +19,7 @@ class MaterialDesignIcons {
     static final List<String> DENSITIES = [
         "anydpi-v21", "hdpi", "mdpi", "xhdpi", "xxhdpi", "xxxhdpi"
     ]
-    static final String ICON_PATTERN = /.*(?=_(black|white)_\d+dp.png)/
+    static final String ICON_PATTERN = /(?<=ic_).*(?=_(black|white)_\d+dp.png)/
     static final Git git = new Git()
 
 
@@ -59,35 +59,11 @@ class MaterialDesignIcons {
         git.exec("-C $rootDir pull origin master")
     }
 
-    def getIndexFile() {
-        new File(rootDir, INDEX_FILE_NAME)
-    }
-
-    def saveIndex() {
-        getIndexFile().text = new JsonBuilder(createIndex()).toString()
-    }
-
     Map<String, String> getIndex() {
         if (index == null) {
-            if (!getIndexFile().isFile()) {
-                saveIndex()
-            }
-            index = new JsonSlurper().parseText(getIndexFile().text) as Map<String, String>
+            index = createIndex()
         }
         index
-    }
-
-    Map<String, List<Icon>> groupIconsByDensity(Asset asset) {
-        def groupIcons = [:]
-
-        listIcons(asset).each { icon ->
-            if (!groupIcons.containsKey(icon.density)) {
-                groupIcons[icon.density] = []
-            }
-            groupIcons[icon.density] << icon
-        }
-
-        groupIcons
     }
 
     List<Icon> listIcons(Asset asset) {
@@ -114,32 +90,23 @@ class MaterialDesignIcons {
         icons
     }
 
-    def installTo(Asset asset, AndroidProject androidProject) {
-        groupIconsByDensity(asset).each { density, icons ->
-            def iconDir = androidProject.iconDirOf(density)
-            if (!iconDir.isDirectory()) {
-                iconDir.mkdirs()
-            }
+    def installTo(List<Asset> assets, AndroidProject androidProject) {
+        assets
+            .collect { listIcons(it) }
+            .flatten()
+            .toSet()
+            .groupBy { it.density }
+            .each { density, icons ->
+                def iconDir = androidProject.iconDirOf(density)
+                if (!iconDir.isDirectory()) {
+                    iconDir.mkdirs()
+                }
 
-            androidProject.copy {
-                from icons.collect { it.toFile() }
-                into iconDir
-            }
-        }
-    }
-
-    def uninstallFrom(Asset asset, AndroidProject androidProject) {
-        groupIconsByDensity(asset).each { density, icons ->
-            def iconDir = androidProject.iconDirOf(density)
-            if (iconDir.isDirectory()) {
-                icons.each { icon ->
-                    new File(iconDir, icon.buildFileName()).delete()
+                androidProject.copy {
+                    from icons.collect { it.toFile() }
+                    into iconDir
                 }
             }
-        }
-    }
-
-    def installIcons(String density, List<File> icons) {
     }
 
     class Icon {
@@ -154,7 +121,32 @@ class MaterialDesignIcons {
         }
 
         String buildFileName() {
-            "${name}_${color}_${size}.png"
+            "ic_${name}_${color}_${size}.png"
+        }
+
+        boolean equals(o) {
+            if (this.is(o)) return true
+            if (getClass() != o.class) return false
+
+            Icon icon = (Icon) o
+
+            if (category != icon.category) return false
+            if (color != icon.color) return false
+            if (density != icon.density) return false
+            if (name != icon.name) return false
+            if (size != icon.size) return false
+
+            return true
+        }
+
+        int hashCode() {
+            int result
+            result = (name != null ? name.hashCode() : 0)
+            result = 31 * result + (color != null ? color.hashCode() : 0)
+            result = 31 * result + (size != null ? size.hashCode() : 0)
+            result = 31 * result + (density != null ? density.hashCode() : 0)
+            result = 31 * result + (category != null ? category.hashCode() : 0)
+            return result
         }
     }
 }

@@ -17,8 +17,8 @@ mdicons {
             colors = "white"
             sizes = "18dp"
             names = [
-                "ic_camera",
-                "ic_class"
+                "camera",
+                "search"
             ]
         }
 
@@ -27,7 +27,7 @@ mdicons {
             colors = "white"
             sizes = "18dp"
             names = [
-                "ic_home"
+                "home"
             ]
         }
     }
