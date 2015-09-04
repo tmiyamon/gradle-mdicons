@@ -1,5 +1,7 @@
 package com.tmiyamon.mdicons
 
+import com.android.build.gradle.AppPlugin
+import com.android.build.gradle.LibraryPlugin
 import com.tmiyamon.mdicons.task.SyncRepositoryTask
 import com.tmiyamon.mdicons.task.UninstallAssetTask
 import com.tmiyamon.mdicons.task.InstallAssetTask
@@ -18,8 +20,12 @@ class MaterialDesignIconsPlugin implements Plugin<Project> {
         def assets = project.container(AssetTarget) {
             String assetName = it.toString()
 
-            installTasks << InstallAssetTask.createTask(project, assetName)
-            uninstallTasks << UninstallAssetTask.createTask(project, assetName)
+            def installTask = InstallAssetTask.createTask(project, assetName)
+            def uninstallTask = UninstallAssetTask.createTask(project, assetName)
+            installTask.dependsOn(uninstallTask)
+
+            installTasks << installTask
+            uninstallTasks <<  uninstallTask
 
             project.extensions.create(it, AssetTarget, assetName)
         }
@@ -32,5 +38,12 @@ class MaterialDesignIconsPlugin implements Plugin<Project> {
 
         InstallAssetTask.createComprehensionTask(project, installTasks)
         UninstallAssetTask.createComprehensionTask(project, uninstallTasks)
+
+        project.plugins.withType(AppPlugin) {
+            project.android.sourceSets.main.res.srcDirs += AndroidProject.RES_RELATIVE_PATH
+        }
+        project.plugins.withType(LibraryPlugin) {
+            project.android.sourceSets.main.res.srcDirs += AndroidProject.RES_RELATIVE_PATH
+        }
     }
 }

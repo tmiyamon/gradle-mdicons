@@ -25,8 +25,8 @@ class InstallAssetTask extends DefaultTask {
         project.task(
             type: InstallAssetTask,
             group: MaterialDesignIconsPlugin.GROUP,
-            description: "Install $assetName asset into your project",
-            "install${Utils.pascalize(assetName)}Asset"
+            description: "Install asset $assetName into your project",
+            "installAsset${Utils.pascalize(assetName)}"
         ) {
             it.assetName = assetName
         }

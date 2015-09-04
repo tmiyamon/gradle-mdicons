@@ -18,7 +18,7 @@ mdicons {
             sizes = "18dp"
             names = [
                 "ic_camera",
-                "ic_search"
+                "ic_class"
             ]
         }
 

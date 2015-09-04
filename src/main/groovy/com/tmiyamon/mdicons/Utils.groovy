@@ -12,7 +12,11 @@ class Utils {
         str.toLowerCase().replaceAll(/(^.|_.)/, replacer)
     }
 
+    static String pathjoin(String...paths) {
+        paths.join(File.separator)
+    }
+
     static File file(File parent, String...paths) {
-        new File(parent, paths.join(File.separator))
+        new File(parent, pathjoin(*paths))
     }
 }

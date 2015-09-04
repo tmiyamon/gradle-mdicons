@@ -8,4 +8,4 @@ gradle/
 gradle.properties
 .java-version
 *.hprof
-example/src/main/res
+example/src/main/res-mdicons

@@ -25,8 +25,8 @@ class UninstallAssetTask extends DefaultTask {
         project.task(
             type: UninstallAssetTask,
             group: MaterialDesignIconsPlugin.GROUP,
-            description: "Uninstall $assetName asset from your project",
-            "uninstall${Utils.pascalize(assetName)}Asset"
+            description: "Uninstall asset $assetName from your project",
+            "uninstallAsset${Utils.pascalize(assetName)}"
         ) {
             it.assetName = assetName
         }
