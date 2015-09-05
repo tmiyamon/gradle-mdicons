@@ -23,11 +23,11 @@ class MaterialDesignIconsPlugin implements Plugin<Project> {
         project.convention.plugins.mdicons = mdicons
         project.extensions.mdicons = mdicons
 
-        SyncRepositoryTask.createTask(project)
+        def syncRepositoryTask = SyncRepositoryTask.createTask(project)
+        def installAssetsTask = InstallAssetsTask.createTask(project)
+        def uninstallAssetsTask = UninstallAssetsTask.createTask(project)
 
-        def installTask = InstallAssetsTask.createTask(project)
-        def uninstallTask = UninstallAssetsTask.createTask(project)
-        installTask.dependsOn(uninstallTask)
+        installAssetsTask.dependsOn(uninstallAssetsTask, syncRepositoryTask)
 
         project.plugins.withType(AppPlugin) {
             project.android.sourceSets.main.res.srcDirs += AndroidProject.RES_RELATIVE_PATH

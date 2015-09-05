@@ -13,7 +13,6 @@ apply plugin: 'com.tmiyamon.mdicons'
 mdicons {
     assets {
         nav {
-            densities = ['mdpi', 'xhdpi']
             colors = "white"
             sizes = "18dp"
             names = [
@@ -23,7 +22,6 @@ mdicons {
         }
 
         toolbar {
-            densities = 'xhdpi'
             colors = "white"
             sizes = "18dp"
             names = [

@@ -9,7 +9,7 @@ class AssetTarget implements Named {
     String name
     ProjectInternal target
 
-    List<String> densities = MaterialDesignIcons.DENSITIES
+    List<String> densities
     List<String> names
     List<String> colors
     List<String> sizes

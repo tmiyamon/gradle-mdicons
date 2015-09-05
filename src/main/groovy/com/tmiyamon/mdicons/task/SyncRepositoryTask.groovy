@@ -10,10 +10,11 @@ class SyncRepositoryTask extends DefaultTask {
     @TaskAction
     def run() {
         def repo = MaterialDesignIcons.newWithRootDir()
-        if(repo.gitClone() == 128) {
+        if (repo.rootDir.isDirectory()) {
             repo.gitPull()
+        } else {
+            repo.gitClone()
         }
-        repo.saveIndex()
     }
 
     static def createTask(Project project) {

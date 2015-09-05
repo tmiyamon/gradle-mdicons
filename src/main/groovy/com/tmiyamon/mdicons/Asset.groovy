@@ -6,18 +6,18 @@ class Asset {
     final String name
     final IconSpec iconSpec
 
-    static Asset newWithAssetTarget(AssetTarget target) {
-        new Asset(target.name, IconSpec.newWithAssetTarget(target))
+    static Asset newWithAssetTarget(Project project, AssetTarget target) {
+        new Asset(target.name, IconSpec.newWithAssetTarget(project, target))
     }
 
     static Asset findOf(Project project, String assetName) {
         def assetTargets = project.userAssets as List<AssetTarget>
-        newWithAssetTarget(assetTargets.find { it.name == assetName })
+        newWithAssetTarget(project, assetTargets.find { it.name == assetName })
     }
 
     static List<Asset> allOf(Project project) {
         def assetTargets = project.userAssets as List<AssetTarget>
-        assetTargets.collect { newWithAssetTarget(it) }
+        assetTargets.collect { newWithAssetTarget(project, it) }
     }
 
     Asset(String name, IconSpec iconSpec) {
@@ -38,9 +38,9 @@ class Asset {
             this.sizes = sizes
         }
 
-        static IconSpec newWithAssetTarget(AssetTarget target) {
+        static IconSpec newWithAssetTarget(Project project, AssetTarget target) {
             new IconSpec(
-                target.densities,
+                target.densities ?: project.mdicons.defaultDensities,
                 target.names,
                 target.colors,
                 target.sizes
