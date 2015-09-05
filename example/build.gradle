@@ -11,22 +11,19 @@ buildscript {
 apply plugin: 'com.tmiyamon.mdicons'
 
 mdicons {
+    defcolor 'mycolor', '#9804d9'
+    
     assets {
         nav {
-            colors = "white"
-            sizes = "18dp"
-            names = [
-                "camera",
-                "search"
-            ]
+            colors "mycolor"
+            sizes  "18dp"
+            names  "camera", "search"
         }
 
         toolbar {
-            colors = "blue"
-            sizes = "18dp"
-            names = [
-                "home"
-            ]
+            colors "blue"
+            sizes  "18dp"
+            names  "home"
         }
     }
 }

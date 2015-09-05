@@ -1,11 +1,9 @@
 package com.tmiyamon.mdicons
 
 import com.tmiyamon.mdicons.cmd.Git
+import org.gradle.api.Project
 
-import javax.imageio.ImageIO
-import java.awt.image.BufferedImage
-
-class MaterialDesignIcons {
+class MaterialDesignIconsRepository {
     static final String URL = "https://github.com/google/material-design-icons.git"
 
     static final String ROOT_DIR_NAME = ".material_design_icons"
@@ -24,8 +22,8 @@ class MaterialDesignIcons {
     static final String ICON_PATTERN = /(?<=ic_).*(?=_(black|white)_\d+dp.png)/
     static final Git git = new Git()
 
-    static newWithRootDir(File rootDir = DEFAULT_ROOT_DIR) {
-        new MaterialDesignIcons(rootDir)
+    static build(Project project, File rootDir = DEFAULT_ROOT_DIR) {
+        new MaterialDesignIconsRepository(project, rootDir)
     }
 
     Map<String, String> createIndex() {
@@ -47,12 +45,14 @@ class MaterialDesignIcons {
 
     final File rootDir
     final File workDir
+    final MaterialDesignColor materialDesignColor
 
     Map<String, String> index;
 
-    MaterialDesignIcons(File rootDir, File workDir = DEFAULT_WORK_DIR) {
+    MaterialDesignIconsRepository(Project project, File rootDir, File workDir = DEFAULT_WORK_DIR) {
         this.rootDir = rootDir
         this.workDir = workDir
+        this.materialDesignColor = MaterialDesignColor.populate(project)
     }
 
     def gitClone() {
@@ -88,63 +88,6 @@ class MaterialDesignIcons {
         icons
     }
 
-    def installTo(List<Asset> assets, AndroidProject androidProject) {
-        Utils.workAt(workDir) { File workingDir ->
-            assets
-                .collect { listIcons(it) }
-                .flatten()
-                .toSet()
-                .groupBy { it.density }
-                .each { density, icons ->
-                    def iconDir = androidProject.iconDirOf(density)
-                    if (!iconDir.isDirectory()) {
-                        iconDir.mkdirs()
-                    }
-
-                    androidProject.copy {
-                        from icons.collect { getOrCreateFileAt(it, workingDir) }
-                        into iconDir
-                    }
-                }
-        }
-    }
-
-    File createFileAt(Icon icon, File workDir) {
-        def workFile = icon.toFile(workDir)
-
-        if (!workFile.isFile()) {
-            BufferedImage baseIconImage = ImageIO.read(icon.newWithColor("white").toFile(rootDir))
-            int w = baseIconImage.width
-            int h = baseIconImage.height
-
-            BufferedImage newIconImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB)
-
-            (0..w-1).each { x ->
-                (0..h-1).each { y ->
-                    int[] pixel = baseIconImage.getRaster().getPixel(x, y, null as int[])
-                    int color = pixel[0]
-                    int alpha = pixel[1]
-
-                    newIconImage.getRaster().setPixel(x, y, [0, 0, 255, alpha] as int[])
-                }
-            }
-
-            workFile.parentFile.mkdirs()
-            ImageIO.write(newIconImage, "png", workFile)
-        }
-
-        workFile
-    }
-
-    File getOrCreateFileAt(Icon icon, File workDir) {
-        def file = icon.toFile(rootDir)
-
-        if (file.isFile()) {
-            file
-        } else {
-            createFileAt(icon, workDir)
-        }
-    }
 
     class Icon {
         final String name
