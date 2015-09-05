@@ -22,7 +22,7 @@ mdicons {
         }
 
         toolbar {
-            colors = "white"
+            colors = "blue"
             sizes = "18dp"
             names = [
                 "home"

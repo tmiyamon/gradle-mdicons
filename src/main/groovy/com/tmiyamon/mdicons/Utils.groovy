@@ -19,4 +19,22 @@ class Utils {
     static File file(File parent, String...paths) {
         new File(parent, pathjoin(*paths))
     }
+
+    static File file(String parent, String...paths) {
+        new File(parent, pathjoin(*paths))
+    }
+
+    static File home(String...paths) {
+        file(System.getProperty("user.home"), *paths)
+    }
+
+    static def workAt(File f, Closure c) {
+        if (!f.isDirectory()) {
+            f.mkdirs()
+        }
+
+        c(f)
+
+        f.deleteDir()
+    }
 }
