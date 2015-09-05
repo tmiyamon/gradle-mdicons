@@ -2,6 +2,7 @@ package com.tmiyamon.mdicons
 
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
+import com.tmiyamon.mdicons.task.ListColorsTask
 import com.tmiyamon.mdicons.task.SyncRepositoryTask
 import com.tmiyamon.mdicons.task.UninstallAssetsTask
 import com.tmiyamon.mdicons.task.InstallAssetsTask
@@ -20,9 +21,14 @@ class MaterialDesignIconsPlugin implements Plugin<Project> {
         }
 
         def mdicons = new MaterialDesignIconsExtension(assets)
+        def colors = MaterialColorLoader.load()
+        colors.each { name, hex ->
+            mdicons.metaClass."$name" = { name }
+        }
         project.convention.plugins.mdicons = mdicons
         project.extensions.mdicons = mdicons
 
+        ListColorsTask.createTask(project)
         def syncRepositoryTask = SyncRepositoryTask.createTask(project)
         def installAssetsTask = InstallAssetsTask.createTask(project)
         def uninstallAssetsTask = UninstallAssetsTask.createTask(project)

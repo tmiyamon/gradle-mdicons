@@ -6,8 +6,8 @@ class MaterialDesignIconsExtension {
     final private NamedDomainObjectContainer<AssetTarget> userAssets
 
     String iconDirPrefix = "mipmap"
-    Map<String, String> mdcolor = MaterialColorLoader.load()
-    List<String> defaultDensities = MaterialDesignIcons.DENSITIES
+    List<String> defaultDensities = MaterialDesignIconsRepository.DENSITIES
+    Map<String, String> defcolors = [:]
 
     public MaterialDesignIconsExtension(NamedDomainObjectContainer<AssetTarget> assets) {
         this.userAssets = assets
@@ -15,5 +15,9 @@ class MaterialDesignIconsExtension {
 
     def assets(Closure c) {
         this.userAssets.configure(c)
+    }
+
+    def defcolor(String name, String hex) {
+        this.defcolors[name] = hex
     }
 }

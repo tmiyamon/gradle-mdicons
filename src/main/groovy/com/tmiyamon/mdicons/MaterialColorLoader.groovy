@@ -7,6 +7,6 @@ class MaterialColorLoader {
 
     static Map<String, String> load() {
         def json = MaterialColorLoader.class.getClassLoader().getResource(FILE_NAME).text
-        new Gson().fromJson(json, new HashMap<String, String>().getClass()) as Map<String, String>
+        new Gson().fromJson(json, new LinkedHashMap<String, String>().getClass()) as Map<String, String>
     }
 }

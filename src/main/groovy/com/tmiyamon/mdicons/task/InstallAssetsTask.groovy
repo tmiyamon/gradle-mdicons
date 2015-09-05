@@ -2,7 +2,9 @@ package com.tmiyamon.mdicons.task
 
 import com.tmiyamon.mdicons.AndroidProject
 import com.tmiyamon.mdicons.Asset
-import com.tmiyamon.mdicons.MaterialDesignIcons
+import com.tmiyamon.mdicons.Installer
+import com.tmiyamon.mdicons.MaterialDesignColor
+import com.tmiyamon.mdicons.MaterialDesignIconsRepository
 import com.tmiyamon.mdicons.MaterialDesignIconsPlugin
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
@@ -14,16 +16,18 @@ class InstallAssetsTask extends DefaultTask {
     @TaskAction
     def run() {
         def assets = Asset.allOf(project)
-        def androidProject = AndroidProject.newWithGradleProject(project)
-        def repository = MaterialDesignIcons.newWithRootDir()
-        repository.installTo(assets, androidProject)
+        def targetProject = AndroidProject.build(project)
+        def repository = MaterialDesignIconsRepository.build()
+        def supportedColors = MaterialDesignColor.populate(project)
+
+        Installer.create(assets, repository, supportedColors, targetProject).install()
     }
 
     static def createTask(Project project) {
         project.task(
             type: InstallAssetsTask,
             group: MaterialDesignIconsPlugin.GROUP,
-            description: "Install assets into your project",
+            description: "Install assets into your targetProject",
             "installAssets"
         )
     }

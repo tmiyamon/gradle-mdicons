@@ -22,8 +22,8 @@ class MaterialDesignIconsRepository {
     static final String ICON_PATTERN = /(?<=ic_).*(?=_(black|white)_\d+dp.png)/
     static final Git git = new Git()
 
-    static build(Project project, File rootDir = DEFAULT_ROOT_DIR) {
-        new MaterialDesignIconsRepository(project, rootDir)
+    static build(File rootDir = DEFAULT_ROOT_DIR) {
+        new MaterialDesignIconsRepository(rootDir)
     }
 
     Map<String, String> createIndex() {
@@ -45,14 +45,12 @@ class MaterialDesignIconsRepository {
 
     final File rootDir
     final File workDir
-    final MaterialDesignColor materialDesignColor
 
     Map<String, String> index;
 
-    MaterialDesignIconsRepository(Project project, File rootDir, File workDir = DEFAULT_WORK_DIR) {
+    MaterialDesignIconsRepository(File rootDir, File workDir = DEFAULT_WORK_DIR) {
         this.rootDir = rootDir
         this.workDir = workDir
-        this.materialDesignColor = MaterialDesignColor.populate(project)
     }
 
     def gitClone() {

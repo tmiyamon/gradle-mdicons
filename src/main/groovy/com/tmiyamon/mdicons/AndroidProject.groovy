@@ -7,7 +7,7 @@ class AndroidProject {
     final Project project
     final File resDir
 
-    static AndroidProject newWithGradleProject(Project project) {
+    static AndroidProject build(Project project) {
         new AndroidProject(project)
     }
 

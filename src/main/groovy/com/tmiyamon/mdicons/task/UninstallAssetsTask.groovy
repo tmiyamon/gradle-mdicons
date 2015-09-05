@@ -10,14 +10,14 @@ import org.gradle.api.tasks.TaskAction
 class UninstallAssetsTask extends DefaultTask {
     @TaskAction
     def run() {
-        AndroidProject.newWithGradleProject(project).resDir.deleteDir()
+        AndroidProject.build(project).resDir.deleteDir()
     }
 
     static def createTask(Project project) {
         project.task(
             type: UninstallAssetsTask,
             group: MaterialDesignIconsPlugin.GROUP,
-            description: "Uninstall assets from your project",
+            description: "Uninstall assets from your targetProject",
             "uninstallAssets"
         )
     }

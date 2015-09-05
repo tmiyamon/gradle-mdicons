@@ -20,29 +20,20 @@ class AssetTarget implements Named {
         this.target = target
     }
 
-    void setDensities(def value) {
-        densities = normalize("densities", value)
+    def colors(String...values) {
+        colors = values
     }
 
-    void setNames(def value) {
-        names = normalize("names", value)
+    def names(String...values) {
+        names = values
     }
 
-    void setColors(def value) {
-        colors = normalize("colors", value)
+    def sizes(String...values) {
+        sizes = values
     }
 
-    void setSizes(def value) {
-        sizes = normalize("sizes", value)
+    def densities(String... values) {
+        densities = values
     }
 
-    static def normalize(def property, def value) {
-        if (value instanceof List<String>) {
-            value
-        } else if (value instanceof String) {
-            [value]
-        } else {
-            throw new IllegalArgumentException("$property accepts only List<String> or String but got $value")
-        }
-    }
 }
