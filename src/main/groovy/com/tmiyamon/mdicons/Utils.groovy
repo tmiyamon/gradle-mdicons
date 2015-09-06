@@ -33,8 +33,10 @@ class Utils {
             f.mkdirs()
         }
 
-        c(f)
-
-        f.deleteDir()
+        try {
+            c(f)
+        } finally {
+            f.deleteDir()
+        }
     }
 }

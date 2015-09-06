@@ -14,7 +14,6 @@ class ColorSet {
         def androidProject = AndroidProject.build(project)
 
         [
-            loader.loadPreset(),
             loader.loadUserColorsInAndroidProject(androidProject),
             loader.loadUserColorsInGradle(project)
         ].each { colorGroup ->
@@ -29,8 +28,8 @@ class ColorSet {
     Map<String, ColorHex> colorIndex() {
         def index = [:]
 
-        colorGroups.each { _, colors ->
-            colors.each { name, hex ->
+        colorGroups.each { colorGroup ->
+            colorGroup.colors.each { name, hex ->
                 index[name] = hex
             }
         }
@@ -72,11 +71,12 @@ class ColorSet {
     }
 
     static class ColorLoader {
-        static final PRESET_FILE_NAME = "com/tmiyamon/mdicons/colors.json"
+        static final PRESET_FILE_NAME = "colors.json"
 
         static ColorGroup loadUserColorsInAndroidProject(AndroidProject androidProject) {
             def colors = new LinkedHashMap<String, String>()
-            def colorFile = Utils.file(androidProject.project.rootDir, "src", "main", "res", "values", "colors.xml")
+            def colorFile = Utils.file(androidProject.resDir, "values", "colors.xml")
+            println colorFile
 
             if (colorFile.isFile()) {
                 def resources = new XmlSlurper().parse(colorFile)
@@ -86,16 +86,16 @@ class ColorSet {
                 }
             }
 
-            new ColorGroup("User Colors ($colorFile)", utilize(colors))
+            new ColorGroup("Defined at $colorFile", utilize(colors))
         }
 
         static ColorGroup loadPreset() {
-            def json = ColorLoader.class.getClassLoader().getResource(PRESET_FILE_NAME).text
+            def json = ColorLoader.class.getClassLoader().getResourceAsStream(PRESET_FILE_NAME).text
             new ColorGroup("Material Design Colors", utilize(new Gson().fromJson(json, new LinkedHashMap<String, String>().getClass()) as Map<String, String>))
         }
 
         static ColorGroup loadUserColorsInGradle(Project project) {
-            new ColorGroup("User Colors (${Utils.file(project.rootDir, "build.gradle").absolutePath})", utilize(project.mdicons.defcolors as Map<String, String>))
+            new ColorGroup("Defined at ${Utils.file(project.rootDir, "build.gradle").absolutePath}", utilize(project.mdicons.defcolors as Map<String, String>))
         }
 
         static Map<String, ColorHex> utilize(Map<String, String> colors) {

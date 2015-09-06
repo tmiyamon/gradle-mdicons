@@ -10,13 +10,6 @@ class Installer {
     final AndroidProject targetProject
 
     static Installer create(List<Asset> assets, MaterialDesignIconsRepository repository, Map<String, ColorHex> colorIndex, AndroidProject project) {
-        assets.each { asset ->
-            asset.iconSpec.colors.each { color ->
-                if (!colorIndex.containsKey(color)) {
-                    throw new IllegalArgumentException("Not found color '${color}' specified in asset '${asset.name}'. You can list supported colors by listColors task.")
-                }
-            }
-        }
         new Installer(assets, repository, colorIndex, project)
     }
 
@@ -35,7 +28,7 @@ class Installer {
                 .toSet()
                 .groupBy { it.density }
                 .each { density, icons ->
-                def iconDir = targetProject.iconDirOf(density)
+                def iconDir = targetProject.resMdiconsDirOf(density)
                 if (!iconDir.isDirectory()) {
                     iconDir.mkdirs()
                 }
@@ -52,6 +45,10 @@ class Installer {
         def workFile = icon.toFile(workDir)
 
         if (!workFile.isFile()) {
+            if (!colorIndex.containsKey(icon.color)) {
+                throw new IllegalArgumentException("Not found color \"${icon.color}\". You can list color definition by listColors task.")
+            }
+
             BufferedImage baseIconImage = ImageIO.read(icon.newWithColor("white").toFile(repository.rootDir))
             int w = baseIconImage.width
             int h = baseIconImage.height

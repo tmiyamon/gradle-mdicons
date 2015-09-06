@@ -10,7 +10,7 @@ import org.gradle.api.tasks.TaskAction
 class UninstallAssetsTask extends DefaultTask {
     @TaskAction
     def run() {
-        AndroidProject.build(project).resDir.deleteDir()
+        AndroidProject.build(project).resMdiconsDir.deleteDir()
     }
 
     static def createTask(Project project) {

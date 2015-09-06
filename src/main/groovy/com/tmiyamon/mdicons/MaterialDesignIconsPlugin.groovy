@@ -11,7 +11,7 @@ import org.gradle.api.Project
 
 class MaterialDesignIconsPlugin implements Plugin<Project> {
     static final String NAME = "mdicons"
-    static final String GROUP = "MaterialDesignIcons"
+    static final String GROUP = "mdicons"
 
     @Override
     void apply(Project project) {
@@ -32,10 +32,10 @@ class MaterialDesignIconsPlugin implements Plugin<Project> {
         installAssetsTask.dependsOn(uninstallAssetsTask, syncRepositoryTask)
 
         project.plugins.withType(AppPlugin) {
-            project.android.sourceSets.main.res.srcDirs += AndroidProject.RES_RELATIVE_PATH
+            project.android.sourceSets.main.res.srcDirs += AndroidProject.RES_MDICONS_RELATIVE_PATH
         }
         project.plugins.withType(LibraryPlugin) {
-            project.android.sourceSets.main.res.srcDirs += AndroidProject.RES_RELATIVE_PATH
+            project.android.sourceSets.main.res.srcDirs += AndroidProject.RES_MDICONS_RELATIVE_PATH
         }
     }
 }

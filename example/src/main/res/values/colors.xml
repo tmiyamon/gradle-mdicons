@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="btn_normal">#02c754</color>
-    <color name="btn_pressed">#006633</color>
+    <color name="primary">#C70275</color>
+    <color name="secondary">#0275C7</color>
 
 </resources>
