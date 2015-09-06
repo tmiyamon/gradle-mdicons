@@ -5,10 +5,6 @@
 
 This plugin will manage Google's official [material design icons](https://github.com/google/material-design-icons) in your build.gradle. The plugin copies specified icons from the material design icon repository into your application allowing you to focus on the png icons only.
 
-This plugin creates a meta file, `.mdicons`, to save settings and avoid evaluation during every build. Changes are automatically detected and icons are updated based on the changes.
-
-Is writing regex painful? A support tool is being written, please be patient.
-
 ## Usage
 
 ```groovy
@@ -34,49 +30,53 @@ The plugin will clone the material design icons repository to your local environ
 
 ## Configuration
 
-Specify the icon(s) name you want to use in your application with a regex pattern. Failure to specify a pattern will result in no icons being added.
-
-The following pattern
-
 ```groovy
 mdicons {
-    pattern '(refresh|search)_white_24dp'
+    defcolor 'mycolor', '#9804d9'
+
+    assets {
+        nav {
+            densities "mdpi", "xxxhdpi"
+            colors "mycolor"
+            sizes  "18dp", "36dp"
+            names  "camera", "search"
+        }
+
+        toolbar {
+            colors "primary", "secondary" // defined in colors.xml
+            sizes  "18dp"
+            names  "home"
+        }
+    }
 }
 ```
 
-results in
+Google's [material design icons repository](https://github.com/google/material-design-icons) follows a naming convention of `*/drawable-{{density}}/ic_{{name}}_{{color}}_{{size}}dp.png`. 
 
-![result](/gradle-mdicons-result.png)
+The blocks in `assets` can have any name and you can define `colors`(required), `sizes`(required), `names`(required) and `densities`(optional) in it, and then the plugin install icons by the combination of them into your project. No specific `densities` means `mdpi, hdpi, xhdpi, xxhdpi, xxxhdpi`.
 
-### Pattern
+## Icon tinting
 
-The regex `pattern` matches the file name of icons, but does not match the icon type such as 'navigation', 'action' etc. The Default is pattern is `null` and will do nothing.
+The icon tinting is supported. The plugin gets the color information from the values of `defcolor` and the `src/main/res/values/colors.xml` file. You can use these color names for `names` in asset block.
 
-Google's [material design icons repository](https://github.com/google/material-design-icons) follows a naming convention of `${iconname}_${color}_${size}`. Where the `color` is `black`, `white` or `grey600` and the `size` is `18dp`, `24dp`, `36dp` or `48dp`.
+At installation of icons, when trying to get a specific color icon fails, the plugin try to convert white one to the color one and install it.
 
-The icon(s) matching the regex pattern will be copied for all screen densities present in the [material design icons repository](https://github.com/google/material-design-icons) (hdpi, mdpi, xhdpi, xxhdpi and xxxhdpi).
+## Tasks
 
-## Experimental
+### installAssets
 
-The following features are now experimental.
+Install assets with supporting tinting. The destination directory is `src/main/res-mdicons` which will be automatically added to the resource path set. When successfully installed, the icons will be reffered by `R.mipmap`. If no problem but you cannot refer them, running `gradle processResources` may help you.
 
-### Asset
+### uninstallAssts
 
-The `asset` feature to support converting icons tinted using ImageMagick is experimentally added.
+Uninstall assets by deleting destination directory.
 
-#### Required
+### listColors
 
-ImageMagick
+You can check out the available colors for `colors` in assets block.
 
-#### Configuration
+### syncRepository
 
-The `name` which is regex pattern matches the file name of icons, `color` which is one of the names for material design's color defined in [colors.json](/src/main/resources/com/tmiyamon/colors.json) and `size` are required for the `asset`.
+Mainly implicitly used but you can explicitly clone or pull the material design repostiory on your system by running this task.
 
-If the Google's material design icons repository does not contain the specified color icon officially, the plugin will try to convert from white icon to the color icon using ImageMagick.
 
-```groovy
-mdicons {
-    asset name: "user", color: "red", size: "18dp"
-    asset name: ["camera.*", "search"], color: ["pink100", "black"], size: ["18dp", "24dp"]
-}
-```

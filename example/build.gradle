@@ -23,13 +23,14 @@ mdicons {
 
     assets {
         nav {
+            densities "mdpi", "xxxhdpi"
             colors "mycolor"
-            sizes  "18dp"
+            sizes  "18dp", "36dp"
             names  "camera", "search"
         }
 
         toolbar {
-            colors "primary"
+            colors "primary", "secondary"
             sizes  "18dp"
             names  "home"
         }

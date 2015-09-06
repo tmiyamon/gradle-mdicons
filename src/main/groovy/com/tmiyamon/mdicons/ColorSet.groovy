@@ -76,7 +76,6 @@ class ColorSet {
         static ColorGroup loadUserColorsInAndroidProject(AndroidProject androidProject) {
             def colors = new LinkedHashMap<String, String>()
             def colorFile = Utils.file(androidProject.resDir, "values", "colors.xml")
-            println colorFile
 
             if (colorFile.isFile()) {
                 def resources = new XmlSlurper().parse(colorFile)

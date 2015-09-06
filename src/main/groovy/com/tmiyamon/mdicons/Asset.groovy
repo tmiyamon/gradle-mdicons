@@ -39,12 +39,22 @@ class Asset {
         }
 
         static IconSpec newWithAssetTarget(Project project, AssetTarget target) {
+            validateRequired(target, "names", "colors", "sizes")
+
             new IconSpec(
                 target.densities ?: project.mdicons.defaultDensities,
                 target.names,
                 target.colors,
                 target.sizes
             )
+        }
+
+        static def validateRequired(AssetTarget target, String...fields) {
+            fields.each { field ->
+                if (target."$field" == null) {
+                    throw new IllegalArgumentException("\"$field\" is required in \"$target.name\"")
+                }
+            }
         }
     }
 }
