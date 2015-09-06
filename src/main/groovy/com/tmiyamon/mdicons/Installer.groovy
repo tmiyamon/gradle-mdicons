@@ -6,24 +6,24 @@ import java.awt.image.BufferedImage
 class Installer {
     final List<Asset> assets
     final MaterialDesignIconsRepository repository
-    final MaterialDesignColor supportedColors
+    final Map<String, ColorHex> colorIndex
     final AndroidProject targetProject
 
-    static Installer create(List<Asset> assets, MaterialDesignIconsRepository repository, MaterialDesignColor supportedColors, AndroidProject project) {
+    static Installer create(List<Asset> assets, MaterialDesignIconsRepository repository, Map<String, ColorHex> colorIndex, AndroidProject project) {
         assets.each { asset ->
             asset.iconSpec.colors.each { color ->
-                if (!supportedColors.containsKey(color)) {
+                if (!colorIndex.containsKey(color)) {
                     throw new IllegalArgumentException("Not found color '${color}' specified in asset '${asset.name}'. You can list supported colors by listColors task.")
                 }
             }
         }
-        new Installer(assets, repository, supportedColors, project)
+        new Installer(assets, repository, colorIndex, project)
     }
 
-    private Installer(List<Asset> assets, MaterialDesignIconsRepository repository, MaterialDesignColor supportedColors, AndroidProject targetProject) {
+    private Installer(List<Asset> assets, MaterialDesignIconsRepository repository, Map<String, ColorHex> colorIndex, AndroidProject targetProject) {
         this.assets = assets
         this.repository = repository
-        this.supportedColors = supportedColors
+        this.colorIndex = colorIndex
         this.targetProject = targetProject
     }
 
@@ -64,7 +64,7 @@ class Installer {
                     int color = pixel[0]
                     int alpha = pixel[1]
 
-                    newIconImage.getRaster().setPixel(x, y, (supportedColors.rgb(icon.color) + [alpha]) as int[])
+                    newIconImage.getRaster().setPixel(x, y, colorIndex[icon.color].rgba(alpha) as int[])
                 }
             }
 

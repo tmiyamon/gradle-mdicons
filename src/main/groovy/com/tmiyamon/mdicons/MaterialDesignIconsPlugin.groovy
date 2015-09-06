@@ -21,10 +21,6 @@ class MaterialDesignIconsPlugin implements Plugin<Project> {
         }
 
         def mdicons = new MaterialDesignIconsExtension(assets)
-        def colors = MaterialColorLoader.load()
-        colors.each { name, hex ->
-            mdicons.metaClass."$name" = { name }
-        }
         project.convention.plugins.mdicons = mdicons
         project.extensions.mdicons = mdicons
 

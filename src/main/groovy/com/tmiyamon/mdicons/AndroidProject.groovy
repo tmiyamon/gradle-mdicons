@@ -21,7 +21,7 @@ class AndroidProject {
     }
 
     File iconDirOf(String density) {
-        new File(resDir, "${project.mdicons.iconDirPrefix}-${density}")
+        Utils.file(resDir, "${project.mdicons.iconDirPrefix}-${density}")
     }
 
     def copy(Closure c) {
