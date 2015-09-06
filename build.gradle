@@ -1,3 +1,5 @@
+import groovy.text.SimpleTemplateEngine
+
 plugins {
     id 'groovy'
     id 'idea'
@@ -51,10 +53,22 @@ if (hasProperty('BINTRAY_API_KEY')) {
     }
 }
 
+task bumpup << {
+    def gitTag = "git tag".execute()
+    def grepVersion = "grep v$version".execute()
+    gitTag | grepVersion
 
-task debugExample << {
-    println subprojects
-//    subprojects.find {
-//        it.projectDir.name == 'example'
-//    }."$task"
+    if (grepVersion.waitFor() == 0) {
+        println "$version is already tagged"
+    } else {
+        def engine = new SimpleTemplateEngine()
+        def readmeTemplate = file("templates/README.md")
+        file("README.md").write(engine.createTemplate(readmeTemplate).make(['version': version]).toString())
+
+        "git add .".execute().waitFor()
+        ["git", "commit", "-m", "bumping version to $version"].execute().waitFor()
+        "git tag v$version".execute().waitFor()
+
+        println "bumping version to $version"
+    }
 }
