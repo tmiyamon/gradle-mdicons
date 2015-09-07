@@ -53,6 +53,12 @@ if (hasProperty('BINTRAY_API_KEY')) {
     }
 }
 
+task syncREADME << {
+    def engine = new SimpleTemplateEngine()
+    def readmeTemplate = file("templates/README.md")
+    file("README.md").write(engine.createTemplate(readmeTemplate).make(['version': version]).toString())
+}
+
 task bumpup << {
     def gitTag = "git tag".execute()
     def grepVersion = "grep v$version".execute()

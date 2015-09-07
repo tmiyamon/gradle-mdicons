@@ -5,6 +5,8 @@
 
 This plugin will manage Google's official [material design icons](https://github.com/google/material-design-icons) in your build.gradle. The plugin copies specified icons from the material design icon repository into your application allowing you to focus on the png icons only.
 
+The working sample project is [here](https://github.com/tmiyamon/gradle-mdicons-sample).
+
 ## Usage
 
 ```groovy
