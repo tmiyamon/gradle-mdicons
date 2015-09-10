@@ -31,12 +31,14 @@ class Utils {
     static def workAt(File f, Closure c) {
         if (!f.isDirectory()) {
             f.mkdirs()
+            L.d("Created working direcotry $f")
         }
 
         try {
             c(f)
         } finally {
             f.deleteDir()
+            L.d("Deleted working directory $f")
         }
     }
 }

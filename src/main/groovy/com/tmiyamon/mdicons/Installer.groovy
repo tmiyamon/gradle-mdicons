@@ -49,7 +49,10 @@ class Installer {
                 throw new IllegalArgumentException("Not found color \"${icon.color}\". You can list color definition by listColors task.")
             }
 
-            BufferedImage baseIconImage = ImageIO.read(icon.newWithColor("white").toFile(repository.rootDir))
+            File baseIconFile = icon.newWithColor("white").toFile(repository.rootDir)
+            L.d("Generating $workFile from $baseIconFile")
+
+            BufferedImage baseIconImage = ImageIO.read(baseIconFile)
             int w = baseIconImage.width
             int h = baseIconImage.height
 
@@ -67,18 +70,22 @@ class Installer {
 
             workFile.parentFile.mkdirs()
             ImageIO.write(newIconImage, "png", workFile)
+            L.d("Generated $workFile")
         }
 
         workFile
     }
 
     File getOrCreateFileAt(MaterialDesignIconsRepository.Icon icon, File workDir) {
+
         def file = icon.toFile(repository.rootDir)
 
-        if (file.isFile()) {
-            file
-        } else {
-            createFileAt(icon, workDir)
-        }
+        L.d("Finding $file")
+
+        def targetFile = file.isFile() ? file : createFileAt(icon, workDir)
+
+        L.d("Found $targetFile")
+
+        targetFile
     }
 }

@@ -7,6 +7,8 @@ This plugin will manage Google's official [material design icons](https://github
 
 The working sample project is [here](https://github.com/tmiyamon/gradle-mdicons-sample).
 
+![gradle-mdicons-result](/gradle-mdicons-result.png)
+
 ## Usage
 
 ```groovy
@@ -39,17 +41,18 @@ mdicons {
     assets {
         nav {
             densities "mdpi", "xxxhdpi"
-            colors "mycolor"
+            colors "mycolor", "white"
             sizes  "18dp", "36dp"
             names  "camera", "search"
         }
 
         toolbar {
-            colors "primary", "secondary" // defined in colors.xml
+            colors "primary", "secondary"
             sizes  "18dp"
             names  "home"
         }
     }
+
 }
 ```
 

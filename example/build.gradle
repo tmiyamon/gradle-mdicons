@@ -19,18 +19,18 @@ allprojects {
 apply plugin: 'com.tmiyamon.mdicons'
 
 mdicons {
-    defcolor 'mycolor', '#9804d9'
+    defcolor 'mycolor', '#009688'
 
     assets {
         nav {
             densities "mdpi", "xxxhdpi"
-            colors "mycolor"
+            colors "mycolor", "white"
             sizes  "18dp", "36dp"
             names  "camera", "search"
         }
 
         toolbar {
-            colors "primary", "secondary"
+            colors "primary", "secondary" // defined in colors.xml
             sizes  "18dp"
             names  "home"
         }
