@@ -50,8 +50,12 @@ class Installer {
             }
 
             File baseIconFile = icon.newWithColor("white").toFile(repository.rootDir)
-            L.d("Generating $workFile from $baseIconFile")
 
+            if (!baseIconFile.isFile()) {
+                throw new IllegalArgumentException("Cannot generate $workFile since $baseIconFile not found.")
+            }
+
+            L.d("Generating $workFile from $baseIconFile")
             BufferedImage baseIconImage = ImageIO.read(baseIconFile)
             int w = baseIconImage.width
             int h = baseIconImage.height
