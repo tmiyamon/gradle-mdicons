@@ -18,7 +18,7 @@ buildscript {
   }
 
   dependencies {
-    classpath 'com.tmiyamon:gradle-mdicons:0.3.0'
+    classpath 'com.tmiyamon:gradle-mdicons:0.3.1'
   }
 }
 
