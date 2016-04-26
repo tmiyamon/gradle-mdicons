@@ -14,6 +14,7 @@ class ColorSet {
         def androidProject = AndroidProject.build(project)
 
         [
+            loader.listProvidedColorsInMaterialDesignRepository(),
             loader.loadUserColorsInAndroidProject(androidProject),
             loader.loadUserColorsInGradle(project)
         ].each { colorGroup ->
@@ -95,6 +96,10 @@ class ColorSet {
 
         static ColorGroup loadUserColorsInGradle(Project project) {
             new ColorGroup("Defined at ${Utils.file(project.rootDir, "build.gradle").absolutePath}", utilize(project.mdicons.defcolors as Map<String, String>))
+        }
+
+        static ColorGroup listProvidedColorsInMaterialDesignRepository() {
+            new ColorGroup("Provided in Material Design Icons Repository", utilize(["white": "#ffffff", "black": "#000000"]))
         }
 
         static Map<String, ColorHex> utilize(Map<String, String> colors) {
