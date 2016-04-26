@@ -46,7 +46,7 @@ class Installer {
 
         if (!workFile.isFile()) {
             if (!colorIndex.containsKey(icon.color)) {
-                throw new IllegalArgumentException("Not found color \"${icon.color}\". You can list color definition by listColors task.")
+                throw new IllegalArgumentException("Unknown color \"${icon.color}\". You can list available colors by running listColors task.")
             }
 
             File baseIconFile = icon.newWithColor("white").toFile(repository.rootDir)
